@@ -117,6 +117,10 @@ cd applications/solvers/incompressible/windEnergy/windPlantSolver.ADM
 wmake
 cd ../../../../../
 
+# The wind plant solver with the uniform actuator disk.
+cd applications/solvers/incompressible/windEnergy/windPlantSolver.ADMUniform
+wmake
+cd ../../../../../
 
 # The basic non-buoyant solver with the standard actuator line.
 cd applications/solvers/incompressible/windEnergy/pisoFoamTurbine.ALM
@@ -149,6 +153,11 @@ fi
 
 # The basic non-buoyant solver with the actuator disk.
 cd applications/solvers/incompressible/windEnergy/pisoFoamTurbine.ADM
+wmake
+cd ../../../../../
+
+# The basic non-buoyant solver with the uniform actuator disk.
+cd applications/solvers/incompressible/windEnergy/pisoFoamTurbine.ADMUniform
 wmake
 cd ../../../../../
 

@@ -2,6 +2,8 @@
     "files.associations": {
         "simplifiedWindTurbinesADM.C": "cpp",
         "horizontalAxisWindTurbinesADM.C": "cpp",
-        "horizontalAxisWindTurbinesADMUniform.C": "cpp"
+        "horizontalAxisWindTurbinesADMUniform.C": "cpp",
+        "simplewindPlantSolver.C": "cpp",
+        "pisoFoamTurbine.C": "cpp"
     }
 }
