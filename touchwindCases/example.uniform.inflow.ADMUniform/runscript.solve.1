@@ -1,0 +1,31 @@
+#!/bin/bash
+
+echo "Loading userinput..."
+chmod u+rwx ./userinput.sh
+source ./userinput.sh
+
+
+
+# specialized file userinput.
+runNumber=1                     		# Enter the run number (useful for keeping track of restarts).
+solver=pisoFoamTurbine.ADMUniform      	# Enter the name of the flow solver.
+
+
+echo "Starting OpenFOAM job at: " $(date)
+echo "using " $cores " cores"
+
+
+# Source the bash profile and then call the appropriate OpenFOAM version function
+# so that all the modules and environment variables get set.
+echo "Sourcing the bash profile, loading modules, and setting the OpenFOAM environment variables..."
+source ~/.bashrc
+source $HOME/OpenFOAM/OpenFOAM-2.4.0/etc/bashrc
+
+# Get the control dictionary for this particular run.
+cp system/controlDict.$runNumber system/controlDict
+
+
+# Run the solver.
+mpirun -np $cores $solver -parallel > log.$runNumber.$solver 2>&1
+
+echo "Ending OpenFOAM job at: " $(date)

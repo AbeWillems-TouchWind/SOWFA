@@ -22,9 +22,7 @@ globalProperties
 
 turbine0
 {
-    turbineType         "NREL5MWRef";
     baseLocation        (5.0191 0.0 -90.0);
-    numBladePoints      64;
     nRadial             64;
     azimuthMaxDist      2.0;
     nAvgSector          1;
