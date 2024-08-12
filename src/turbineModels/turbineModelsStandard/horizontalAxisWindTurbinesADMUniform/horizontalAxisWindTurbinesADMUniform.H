@@ -181,7 +181,7 @@ private:
             //  means that the blades are first advanced to thier t^(n+1) location, and then
             //  velocity is sampled there, blade forces are computed there, and body forces
             //  are projected.   
-            DynamicList<word> bladeUpdateType;
+            // DynamicList<word> bladeUpdateType;
 
             //- List of body force normalization parameter for each turbine (m). This controls
             //  the width of the Gaussian projection.  It should be tied to grid width.
@@ -206,7 +206,7 @@ private:
 
             //- List of tip/root loss correction type for each turbine.  "none" applies
             //  no correction.  "Glauert" applies the Glauert tip loss correction.
-            DynamicList<word> tipRootLossCorrType;
+            // DynamicList<word> tipRootLossCorrType;
 	    
 	    //- Rotor rotation direction as viewed from upwind.  Options are
 	    //  "cw" for clockwise and "ccw" for counter-clockwise.
@@ -216,17 +216,17 @@ private:
 	    //  clockwise rotation for a clockwise rotating turbine (see rotationDir
 	    //  above) or counter-clockwise rotation for a counter-clockwise
 	    //  rotating turbine.
-            DynamicList<scalar> rotSpeed;
+            // DynamicList<scalar> rotSpeed;
 
             //- Filtered rotor speed that is fed to the controllers (rpm).
-            DynamicList<scalar> rotSpeedF;
+            // DynamicList<scalar> rotSpeedF;
 
             //- Speed error between reference low speed shaft and filtered low speed
             //  shaft speed for use in blade pitch PID control (rad/s).
-            DynamicList<scalar> speedError;
+            // DynamicList<scalar> speedError;
 
             //- Integrated speed error used in blade pitch PID control (rad/s).
-            DynamicList<scalar> intSpeedError;
+            // DynamicList<scalar> intSpeedError;
 
             //- Initial blade 1 azimuth angle (degrees) (looking from upwind to 
 	    //  downwind, a positive azimuth angle makes a clockwise movement if
@@ -236,10 +236,10 @@ private:
             DynamicList<scalar> azimuth;
 
             //- Initial generator torque on turbine (not density normalized).
-            DynamicList<scalar> torqueGen;
+            // DynamicList<scalar> torqueGen;
 
             //- Initial blade pitch (degrees) of all blades.
-            DynamicList<scalar> pitch;
+            // DynamicList<scalar> pitch;
 
             //- Initial or fixed nacelle yaw angle.  Direction that the turbine
             //  is pointed in cardinal directions (i.e. 0 = north, 90 = east, 
@@ -247,6 +247,11 @@ private:
             //  in the more standard mathematical convention of 0 degrees on the 
             //  + x axis and positive degrees in the counter-clockwise direction.
             DynamicList<scalar> nacYaw;
+
+            //- Initial or fixed nacelle tilt angle.  Direction that the nacelle
+            //  is pointed in (i.e. 0 = horizontal, -90 = helicoptor) degrees.  
+            //  This is converted to radians
+            DynamicList<scalar> nacTilt;
 
             //- Specify the fluid density (kg/m^3).  This turbine model is to be  
             //  used with an incompressible solver, so density divides out of the 
@@ -276,7 +281,7 @@ private:
 
             //*** THE FOLLOWING VARIABLES MATCH FAST INPUT FILE ***
             //- Number of blades;
-            DynamicList<int> NumBl;
+        //     DynamicList<int> NumBl;
 
             //- Distance from rotor apex to blade tip (m).
             DynamicList<scalar> TipRad;
@@ -296,172 +301,172 @@ private:
             //- Vertical distance from tower-top to rotor shaft centerline (m).
             DynamicList<scalar> Twr2Shft;
 
-            //- Shaft tilt-up angle (degrees).
-            DynamicList<scalar> ShftTilt;
+        //     //- Shaft tilt-up angle (degrees).
+        //     DynamicList<scalar> ShftTilt;
 
             //- Coning angle of blades (degrees) (one for each blade).
             DynamicList<vector> PreCone;
 
-            //- Gear-box ratio.
-            DynamicList<scalar> GBRatio;
+        //     //- Gear-box ratio.
+        //     DynamicList<scalar> GBRatio;
 
-            //- Gear-box efficiency.
-            DynamicList<scalar> GBEfficiency;
+        //     //- Gear-box efficiency.
+        //     DynamicList<scalar> GBEfficiency;
 
-            //- Generator efficiency.
-            DynamicList<scalar> GenEfficiency;
+        //     //- Generator efficiency.
+        //     DynamicList<scalar> GenEfficiency;
 
-            //- Rated rotor speed (rpm).
-            DynamicList<scalar> RatedRotSpeed;
+        //     //- Rated rotor speed (rpm).
+        //     DynamicList<scalar> RatedRotSpeed;
 
-            //- Moment of inertia of generator about high-speed shaft (kg-m^2).
-            DynamicList<scalar> GenIner;
+        //     //- Moment of inertia of generator about high-speed shaft (kg-m^2).
+        //     DynamicList<scalar> GenIner;
 
-            //- Moment of inertia of hub about rotor shaft (kg-m^2).
-            DynamicList<scalar> HubIner;
-            //*** END OF FAST INPUT FILE VARIABLES ***
+        //     //- Moment of inertia of hub about rotor shaft (kg-m^2).
+        //     DynamicList<scalar> HubIner;
+        //     //*** END OF FAST INPUT FILE VARIABLES ***
 
-            //- Moment of inertia of a single blade about rotor shaft (kg-m^2).
-            DynamicList<scalar> BladeIner;
+        //     //- Moment of inertia of a single blade about rotor shaft (kg-m^2).
+        //     DynamicList<scalar> BladeIner;
 
-            //- Moment of inertia of entire drivetrain (rotor blades, hub, and
-            //  generator about the rotor shaft (kg-m^2).
-            DynamicList<scalar> DriveTrainIner;
+        //     //- Moment of inertia of entire drivetrain (rotor blades, hub, and
+        //     //  generator about the rotor shaft (kg-m^2).
+        //     DynamicList<scalar> DriveTrainIner;
 
-            //- Rotor speed controller type.  Options are "none" or "fiveRegion".
-            //  "none" provides no torque control and the rotor rotates at a 
-            //  constant rate specified by the variable "rotSpeed".  "fiveRegion"
-            //  controls rotor speed through generator torque in regions 1, 1-1/2,
-            //  2, 2-1/2, and 3.  Torque control alone will not control speed in
-            //  region 3, but if no pitch control is implemented, then rotor speed
-            //  will be limited at rated regardless of generator and rotor torque.
-            DynamicList<word> GenTorqueControllerType;
+        //     //- Rotor speed controller type.  Options are "none" or "fiveRegion".
+        //     //  "none" provides no torque control and the rotor rotates at a 
+        //     //  constant rate specified by the variable "rotSpeed".  "fiveRegion"
+        //     //  controls rotor speed through generator torque in regions 1, 1-1/2,
+        //     //  2, 2-1/2, and 3.  Torque control alone will not control speed in
+        //     //  region 3, but if no pitch control is implemented, then rotor speed
+        //     //  will be limited at rated regardless of generator and rotor torque.
+        //     DynamicList<word> GenTorqueControllerType;
 
-	    //- Nacelle yaw controller type (NOT IMPLEMENTED, just remains at 
-	    //  specified nacYaw).
-	    DynamicList<word> NacYawControllerType;
+	    // //- Nacelle yaw controller type (NOT IMPLEMENTED, just remains at 
+	    // //  specified nacYaw).
+	    // DynamicList<word> NacYawControllerType;
 
-	    //- Pitch controller type (NOT IMPLEMENTED, just remains at 
-	    //  specified pitch).
-	    DynamicList<word> BladePitchControllerType;
+	    // //- Pitch controller type (NOT IMPLEMENTED, just remains at 
+	    // //  specified pitch).
+	    // DynamicList<word> BladePitchControllerType;
 
-            //- Engage a rotor speed limiter (do not let rotor speed exceed rated
-            //  or become negative.
-            DynamicList<bool> RotSpeedLimiter;
+        //     //- Engage a rotor speed limiter (do not let rotor speed exceed rated
+        //     //  or become negative.
+        //     DynamicList<bool> RotSpeedLimiter;
 
-            //- Engage a generator torque rate limiter.
-            DynamicList<bool> GenTorqueRateLimiter;
+        //     //- Engage a generator torque rate limiter.
+        //     DynamicList<bool> GenTorqueRateLimiter;
 
-            //- Engage a yaw rate limiter.
-            DynamicList<bool> NacYawRateLimiter;
+        //     //- Engage a yaw rate limiter.
+        //     DynamicList<bool> NacYawRateLimiter;
 
-            //- Engage a blade pitch rate limiter.
-            DynamicList<bool> BladePitchRateLimiter;
+        //     //- Engage a blade pitch rate limiter.
+        //     DynamicList<bool> BladePitchRateLimiter;
 
-            //- Parameter for low-pass speed filter for control system (Hz).
-            DynamicList<scalar> SpeedFilterCornerFrequency;
-
-
-            //- Generator torque control parameters.
-                //- Limiter on rate of change of generator torque (N-m/s).
-                DynamicList<scalar> RateLimitGenTorque;
-
-                //- Cut-in generator speed (rpm).
-                DynamicList<scalar> CutInGenSpeed;
-
-                //- Generator speed at start of region 2 (rpm).
-                DynamicList<scalar> Region2StartGenSpeed;
-
-                //- Generator speed at end of region 2 (rpm).
-                DynamicList<scalar> Region2EndGenSpeed;
-
-                //- Cut-in generator torque (N-m).
-                DynamicList<scalar> CutInGenTorque;
-
-                //- Rated generator torque (N-m).
-                DynamicList<scalar> RatedGenTorque;
-
-                //- Torque controller constant of proportionality (N-m/rpm^2).
-                //  T_gen = K_gen*omega^2.
-                DynamicList<scalar> KGen;
-
-                //- Generator speed versus generator torque table (rpm, N-m).
-                DynamicList<List<List<scalar> > > SpeedTorqueTable;
-                DynamicList<DynamicList<scalar> > SpeedGenProfile;
-                DynamicList<DynamicList<scalar> > TorqueGenProfile;
+        //     //- Parameter for low-pass speed filter for control system (Hz).
+        //     DynamicList<scalar> SpeedFilterCornerFrequency;
 
 
-            //- Pitch control parameters.
-                //- Maximum rate of change of blade pitch (degree/s).
-                DynamicList<scalar> RateLimitBladePitch;
+        //     //- Generator torque control parameters.
+        //         //- Limiter on rate of change of generator torque (N-m/s).
+        //         DynamicList<scalar> RateLimitGenTorque;
 
-                //- Minimum pitch (degrees).
-                DynamicList<scalar> PitchMin;
+        //         //- Cut-in generator speed (rpm).
+        //         DynamicList<scalar> CutInGenSpeed;
 
-                //- Maximum pitch (degrees).
-                DynamicList<scalar> PitchMax;
+        //         //- Generator speed at start of region 2 (rpm).
+        //         DynamicList<scalar> Region2StartGenSpeed;
 
-                //- Blade pitch angle at which the sensitivity of power to
-                //  changes in blade pitch has doubled from its value at the
-                //  rated operating point (degrees).
-                DynamicList<scalar> PitchK;
+        //         //- Generator speed at end of region 2 (rpm).
+        //         DynamicList<scalar> Region2EndGenSpeed;
 
-                //- Pitch control gains.
-                DynamicList<scalar> PitchControlKP; // (s)
-                DynamicList<scalar> PitchControlKI; // (unitless)
-                DynamicList<scalar> PitchControlKD; // (s^2)
+        //         //- Cut-in generator torque (N-m).
+        //         DynamicList<scalar> CutInGenTorque;
+
+        //         //- Rated generator torque (N-m).
+        //         DynamicList<scalar> RatedGenTorque;
+
+        //         //- Torque controller constant of proportionality (N-m/rpm^2).
+        //         //  T_gen = K_gen*omega^2.
+        //         DynamicList<scalar> KGen;
+
+        //         //- Generator speed versus generator torque table (rpm, N-m).
+        //         DynamicList<List<List<scalar> > > SpeedTorqueTable;
+        //         DynamicList<DynamicList<scalar> > SpeedGenProfile;
+        //         DynamicList<DynamicList<scalar> > TorqueGenProfile;
+
+
+        //     //- Pitch control parameters.
+        //         //- Maximum rate of change of blade pitch (degree/s).
+        //         DynamicList<scalar> RateLimitBladePitch;
+
+        //         //- Minimum pitch (degrees).
+        //         DynamicList<scalar> PitchMin;
+
+        //         //- Maximum pitch (degrees).
+        //         DynamicList<scalar> PitchMax;
+
+        //         //- Blade pitch angle at which the sensitivity of power to
+        //         //  changes in blade pitch has doubled from its value at the
+        //         //  rated operating point (degrees).
+        //         DynamicList<scalar> PitchK;
+
+        //         //- Pitch control gains.
+        //         DynamicList<scalar> PitchControlKP; // (s)
+        //         DynamicList<scalar> PitchControlKI; // (unitless)
+        //         DynamicList<scalar> PitchControlKD; // (s^2)
      
        
-            //- Nacelle yaw control parameters
-                //- Maximum rate of change of nacelle yaw (degrees/s).
-                DynamicList<scalar> RateLimitNacYaw;
+        //     //- Nacelle yaw control parameters
+        //         //- Maximum rate of change of nacelle yaw (degrees/s).
+        //         DynamicList<scalar> RateLimitNacYaw;
 
 
 
-            //- List of airfoils that compose turbine blade;
-            DynamicList<List<word> > AirfoilType;
+        //     //- List of airfoils that compose turbine blade;
+        //     DynamicList<List<word> > AirfoilType;
 
 
-            //- Lists of blade data for each turbine type.
-                //- Overall blade data array.
-                DynamicList<List<List<scalar> > > BladeData;
+        //     //- Lists of blade data for each turbine type.
+        //         //- Overall blade data array.
+        //         DynamicList<List<List<scalar> > > BladeData;
 
-                //- Station along blade in which information is given (m).
-                DynamicList<DynamicList<scalar> > BladeStation;
+        //         //- Station along blade in which information is given (m).
+        //         DynamicList<DynamicList<scalar> > BladeStation;
 
-                //- Chord at this station (m).
-                DynamicList<DynamicList<scalar> > BladeChord;
+        //         //- Chord at this station (m).
+        //         DynamicList<DynamicList<scalar> > BladeChord;
 
-                //- Twist at this station (degrees).
-                DynamicList<DynamicList<scalar> > BladeTwist;
+        //         //- Twist at this station (degrees).
+        //         DynamicList<DynamicList<scalar> > BladeTwist;
 
-                //- Airfoil type ID at this station.
-                DynamicList<DynamicList<label> > BladeAirfoilTypeID;
+        //         //- Airfoil type ID at this station.
+        //         DynamicList<DynamicList<label> > BladeAirfoilTypeID;
 
 
 
-        //- Airfoil Level Data (all variables start with a lower-case letter).
-            //- Number of distinct airfoils being used in turbines in array.
-            int numAirfoilsDistinct;
+        // //- Airfoil Level Data (all variables start with a lower-case letter).
+        //     //- Number of distinct airfoils being used in turbines in array.
+        //     int numAirfoilsDistinct;
 
-            //- List of distinct type of airfoils amongst all turbines in array.
-            DynamicList<word> airfoilTypesDistinct;
+        //     //- List of distinct type of airfoils amongst all turbines in array.
+        //     DynamicList<word> airfoilTypesDistinct;
 
-            //- Overall airfoil data array.
-            DynamicList<List<List<scalar> > > airfoilData;
+        //     //- Overall airfoil data array.
+        //     DynamicList<List<List<scalar> > > airfoilData;
             
-            //- Angle-of-attack.
-            DynamicList<DynamicList<scalar> > airfoilAlpha;
+        //     //- Angle-of-attack.
+        //     DynamicList<DynamicList<scalar> > airfoilAlpha;
 
-            //- Lift Coefficient.
-            DynamicList<DynamicList<scalar> > airfoilCl;
+        //     //- Lift Coefficient.
+        //     DynamicList<DynamicList<scalar> > airfoilCl;
 
-            //- Drag Coefficient.
-            DynamicList<DynamicList<scalar> > airfoilCd;
+        //     //- Drag Coefficient.
+        //     DynamicList<DynamicList<scalar> > airfoilCd;
 
 
 
-        //- Important Actuator Line Geometry Data.
+        // //- Important Actuator Line Geometry Data.
             //- List of turbines that this processor can forseeably control.
             DynamicList<label> turbinesControlled;
 
@@ -510,7 +515,7 @@ private:
             DynamicList<List<scalar> > bladeRadius;
 
             //- Solidity at a given radius.
-            DynamicList<List<scalar> > solidity;
+            // DynamicList<List<scalar> > solidity;
 
 	    //- An indicator of shaft direction.  The convention is that when viewed
             //  from upwind, the rotor turns clockwise for positive rotation angles,
@@ -557,59 +562,59 @@ private:
         //  every time step.
 
             //- Angle of attack at each actuator point.
-            DynamicList<List<List<scalar> > > alpha;
-            DynamicList<List<List<scalar> > > alphaSecAvg;
+            // DynamicList<List<List<scalar> > > alpha;
+            // DynamicList<List<List<scalar> > > alphaSecAvg;
 
             //- Wind magnitude (not including radial wind) at each actuator point.
-            DynamicList<List<List<scalar> > > Vmag;
+            // DynamicList<List<List<scalar> > > Vmag;
             DynamicList<List<List<scalar> > > VmagN;
             DynamicList<scalar> VmagNAvg;
-            DynamicList<List<List<scalar> > > VmagSecAvg;
+            // DynamicList<List<List<scalar> > > VmagSecAvg;
             DynamicList<List<List<scalar> > > VmagNSecAvg;
 
             //- Coefficient of lift at each actuator point. 
-            DynamicList<List<List<scalar> > > Cl;
-            DynamicList<List<List<scalar> > > ClSecAvg;
+            // DynamicList<List<List<scalar> > > Cl;
+            // DynamicList<List<List<scalar> > > ClSecAvg;
 
             //- Coefficient of drag at each actuator point. 
-            DynamicList<List<List<scalar> > > Cd;
-            DynamicList<List<List<scalar> > > CdSecAvg;
+            // DynamicList<List<List<scalar> > > Cd;
+            // DynamicList<List<List<scalar> > > CdSecAvg;
 
             //- Lift at each actuator point. 
-            DynamicList<List<List<scalar> > > lift;
-            DynamicList<List<List<scalar> > > liftSecAvg;
+            // DynamicList<List<List<scalar> > > lift;
+            // DynamicList<List<List<scalar> > > liftSecAvg;
 
             //- Drag at each actuator point. 
-            DynamicList<List<List<scalar> > > drag;
-            DynamicList<List<List<scalar> > > dragSecAvg;
+            // DynamicList<List<List<scalar> > > drag;
+            // DynamicList<List<List<scalar> > > dragSecAvg;
 
             //- Axial force at each actuator point (not pointed in blade-local
             //  axial, but rather along shaft). 
-            DynamicList<List<List<scalar> > > axialForce;
+            // DynamicList<List<List<scalar> > > axialForce;
             DynamicList<List<List<scalar> > > axialForceSimplified;
-            DynamicList<List<List<scalar> > > axialForceSecAvg;
+            // DynamicList<List<List<scalar> > > axialForceSecAvg;
 
             //- Tangential force at each actuator point.
-            DynamicList<List<List<scalar> > > tangentialForce;
+            // DynamicList<List<List<scalar> > > tangentialForce;
             DynamicList<List<List<scalar> > > tangentialForceSimplified;
-            DynamicList<List<List<scalar> > > tangentialForceSecAvg;
+            // DynamicList<List<List<scalar> > > tangentialForceSecAvg;
 
             //- Thrust on turbine.
-            DynamicList<scalar> thrust;
+            // DynamicList<scalar> thrust;
             DynamicList<scalar> thrustSimplified;
 
             //- Total rotor torque/density on turbine.
-            DynamicList<scalar> torqueRotor;
+            // DynamicList<scalar> torqueRotor;
             DynamicList<scalar> torqueRotorSimplified;
 
             //- Total force on turbine according to simplified calculations.
             DynamicList<scalar> TotalForceTurbineSimplified;
 
             //- Power on turbine rotor.
-            DynamicList<scalar> powerRotor;
+            // DynamicList<scalar> powerRotor;
 
             // - Power on the generator.
-            DynamicList<scalar> powerGenerator;
+            // DynamicList<scalar> powerGenerator;
 
             //- Total power of turbine according to simplified calculations.
             DynamicList<scalar> powerRotorSimplified;
@@ -619,10 +624,10 @@ private:
 
         //- Output Data File Information.
             //- List of output files for angle of attack.
-            OFstream* alphaFile_;
+            // OFstream* alphaFile_;
 
             //- List of output files for wind magnitude.
-            OFstream* VmagFile_;
+            // OFstream* VmagFile_;
 
             //- List of output files for average wind magnitude.
             OFstream* VmagNFile_;
@@ -631,67 +636,67 @@ private:
             OFstream* VmagNAvgFile_;
 
             //- List of output files for axial velocity.
-            OFstream* VaxialFile_;
+            // OFstream* VaxialFile_;
 
             //- List of output files for tangential velocity.
-            OFstream* VtangentialFile_;
+            // OFstream* VtangentialFile_;
 
             //- List of output files for radial velocity.
-            OFstream* VradialFile_;
+            // OFstream* VradialFile_;
 
             //- List of output files for coefficient of lift.
-            OFstream* ClFile_;
+            // OFstream* ClFile_;
 
             //- List of output files for coefficient of drag.
-            OFstream* CdFile_;
+            // OFstream* CdFile_;
 
             //- List of output files for lift/density.
-            OFstream* liftFile_;
+            // OFstream* liftFile_;
 
             //- List of output files for drag/density.
-            OFstream* dragFile_;
+            // OFstream* dragFile_;
 
             //- List of output files for axial force/density.
-            OFstream* axialForceFile_;
+            // OFstream* axialForceFile_;
 
             //- List of output files for tangential/density.
-            OFstream* tangentialForceFile_;
+            // OFstream* tangentialForceFile_;
 
             //- List of output files for total aerodynamic torque/density.
-            OFstream* torqueRotorFile_;
+            // OFstream* torqueRotorFile_;
 
             //- List of output files for generator torque/density.
-            OFstream* torqueGenFile_;
+            // OFstream* torqueGenFile_;
 
             //- List of output files for total thrust/density.
-            OFstream* thrustFile_;
+            // OFstream* thrustFile_;
 
             //- List of output files for total thrust/density.
             OFstream* thrustSimplifiedFile_;
 
             //- List of output files for total power/density.
-            OFstream* powerRotorFile_;
+            // OFstream* powerRotorFile_;
             
             //- List of output files for total power/density.
-            OFstream* powerGeneratorFile_;
+            // OFstream* powerGeneratorFile_;
 
             //- List of output files for total power/density.
             OFstream* powerSimplifiedFile_;
 
             //- List of output files for rotation rate.
-            OFstream* rotSpeedFile_;
+            // OFstream* rotSpeedFile_;
 
             //- List of output files for filtered rotation rate.
-            OFstream* rotSpeedFFile_;
+            // OFstream* rotSpeedFFile_;
 
             //- List of output files for blade 1 azimuth angle.
-            OFstream* azimuthFile_;
+            // OFstream* azimuthFile_;
 
             //- List of output files for blade pitch angle.
-            OFstream* pitchFile_;
+            // OFstream* pitchFile_;
 
             //- List of output files for nacelle yaw angle.
-            OFstream* nacYawFile_;
+            // OFstream* nacYawFile_;
 
             //- List of output files for nacelle yaw angle.
             OFstream* TotalForceTurbineSimplifiedFile_;
@@ -704,25 +709,25 @@ private:
     // Private Member Functions
         
         //- Rotate the blades.
-        void rotateBlades();
+        // void rotateBlades();
         
         //- Yaw the nacelle.
         void yawNacelle();
 
         //- Computer the rotor speed.
-        void computeRotSpeed();
+        // void computeRotSpeed();
 
         //- Filter the rotor speed with a low pass filter for control system.
-        void filterRotSpeed();
+        // void filterRotSpeed();
         
         //- Calculate generator torque.
-        void controlGenTorque();
+        // void controlGenTorque();
 
 	//- Calculate the nacelle yaw position.
-	void controlNacYaw();
+	// void controlNacYaw();
 
         //- Calculate the blade pitch.
-        void controlBladePitch();
+        // void controlBladePitch();
 
         //- Find out which processor zone each actuator line point lies within.
         //  (Which processor is controlling each actuator line point?)

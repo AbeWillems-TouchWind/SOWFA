@@ -87,3 +87,16 @@ doc/Doxygen/DTAGS
 
 # Ignore log files
 log.*
+
+
+# Ignore any folder named VTK inside myfolder or its subfolders
+touchwindCases/**/VTK/
+
+# Ignore any .zip files inside myfolder or its subfolders
+touchwindCases/**/*.zip
+
+# Ignore any folder that consists of only digits (e.g., 0, 100, 101, 200, etc.)
+touchwindCases/**/[0-9]*/
+
+# Ignore any folder that consists of only digits (e.g., 0, 100, 101, 200, etc.)
+touchwindCases/**/turbineOutput/

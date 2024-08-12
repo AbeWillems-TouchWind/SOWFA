@@ -155,23 +155,24 @@ horizontalAxisWindTurbinesADMUniform::horizontalAxisWindTurbinesADMUniform
         nAvgSector.append(int(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("nAvgSector"))));
         pointDistType.append(word(turbineArrayProperties.subDict(turbineName[i]).lookup("pointDistType")));
         pointInterpType.append(word(turbineArrayProperties.subDict(turbineName[i]).lookup("pointInterpType")));
-        bladeUpdateType.append(word(turbineArrayProperties.subDict(turbineName[i]).lookup("bladeUpdateType")));
+        // bladeUpdateType.append(word(turbineArrayProperties.subDict(turbineName[i]).lookup("bladeUpdateType")));
         epsilon.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("epsilon"))));
         forceScalar.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("forceScalar"))));
         inflowVelocityScalar.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("inflowVelocityScalar"))));
-        tipRootLossCorrType.append(word(turbineArrayProperties.subDict(turbineName[i]).lookup("tipRootLossCorrType")));
+        // tipRootLossCorrType.append(word(turbineArrayProperties.subDict(turbineName[i]).lookup("tipRootLossCorrType")));
         rotationDir.append(word(turbineArrayProperties.subDict(turbineName[i]).lookup("rotationDir")));
-        rotSpeed.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("RotSpeed"))));
-        rotSpeedF.append(rotSpeed[i]);
-        speedError.append(0.0);
-        intSpeedError.append(0.0);
+        // rotSpeed.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("RotSpeed"))));
+        // rotSpeedF.append(rotSpeed[i]);
+        // speedError.append(0.0);
+        // intSpeedError.append(0.0);
         azimuth.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Azimuth"))));
-        torqueGen.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("TorqueGen"))));
-        pitch.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Pitch"))));
+        // torqueGen.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("TorqueGen"))));
+        // pitch.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Pitch"))));
         nacYaw.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("NacYaw"))));
+        nacTilt.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("NacTilt"))));
         fluidDensity.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("fluidDensity")))); 
-        Ct.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Ct")))); 
-        XChi.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("XChi")))); 
+        Ct.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Ct"))));
+        XChi.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("XChi"))));
     }
 
 
@@ -211,7 +212,6 @@ horizontalAxisWindTurbinesADMUniform::horizontalAxisWindTurbinesADMUniform
 
 
 
-
     // For each distinct turbine, read in properties of that turbine from separate
     // dictionaries.
 
@@ -231,125 +231,125 @@ horizontalAxisWindTurbinesADMUniform::horizontalAxisWindTurbinesADMUniform
         );
 
         // Read in the data.
-        NumBl.append(scalar(readScalar(turbineProperties.lookup("NumBl"))));
+        // NumBl.append(scalar(readScalar(turbineProperties.lookup("NumBl"))));
         TipRad.append(scalar(readScalar(turbineProperties.lookup("TipRad"))));
         HubRad.append(scalar(readScalar(turbineProperties.lookup("HubRad"))));
         UndSling.append(scalar(readScalar(turbineProperties.lookup("UndSling"))));
         OverHang.append(scalar(readScalar(turbineProperties.lookup("OverHang"))));
         TowerHt.append(scalar(readScalar(turbineProperties.lookup("TowerHt"))));
         Twr2Shft.append(scalar(readScalar(turbineProperties.lookup("Twr2Shft"))));
-        ShftTilt.append(scalar(readScalar(turbineProperties.lookup("ShftTilt"))));
+        // ShftTilt.append(scalar(readScalar(turbineProperties.lookup("ShftTilt"))));
         PreCone.append(vector(turbineProperties.lookup("PreCone")));
-        GBRatio.append(scalar(readScalar(turbineProperties.lookup("GBRatio"))));
-        GBEfficiency.append(scalar(readScalar(turbineProperties.lookup("GBEfficiency"))));
-        GenEfficiency.append(scalar(readScalar(turbineProperties.lookup("GenEfficiency"))));
-        RatedRotSpeed.append(scalar(readScalar(turbineProperties.lookup("RatedRotSpeed"))));
-        GenIner.append(scalar(readScalar(turbineProperties.lookup("GenIner"))));
-        HubIner.append(scalar(readScalar(turbineProperties.lookup("HubIner"))));
-        BladeIner.append(scalar(readScalar(turbineProperties.lookup("BladeIner"))));
-        DriveTrainIner.append(NumBl[i]*BladeIner[i] + HubIner[i] + GBRatio[i]*GBRatio[i]*GenIner[i]);
-        GenTorqueControllerType.append(word(turbineProperties.lookup("GenTorqueControllerType")));
-        NacYawControllerType.append(word(turbineProperties.lookup("NacYawControllerType")));
-        BladePitchControllerType.append(word(turbineProperties.lookup("BladePitchControllerType")));
-        RotSpeedLimiter.append(bool(readBool(turbineProperties.lookup("RotSpeedLimiter"))));
-        GenTorqueRateLimiter.append(bool(readBool(turbineProperties.lookup("GenTorqueRateLimiter"))));
-        NacYawRateLimiter.append(bool(readBool(turbineProperties.lookup("NacYawRateLimiter"))));
-        BladePitchRateLimiter.append(bool(readBool(turbineProperties.lookup("BladePitchRateLimiter"))));
-        SpeedFilterCornerFrequency.append(scalar(readScalar(turbineProperties.lookup("SpeedFilterCornerFrequency"))));
+        // GBRatio.append(scalar(readScalar(turbineProperties.lookup("GBRatio"))));
+        // GBEfficiency.append(scalar(readScalar(turbineProperties.lookup("GBEfficiency"))));
+        // GenEfficiency.append(scalar(readScalar(turbineProperties.lookup("GenEfficiency"))));
+        // RatedRotSpeed.append(scalar(readScalar(turbineProperties.lookup("RatedRotSpeed"))));
+        // GenIner.append(scalar(readScalar(turbineProperties.lookup("GenIner"))));
+        // HubIner.append(scalar(readScalar(turbineProperties.lookup("HubIner"))));
+        // BladeIner.append(scalar(readScalar(turbineProperties.lookup("BladeIner"))));
+        // DriveTrainIner.append(NumBl[i]*BladeIner[i] + HubIner[i] + GBRatio[i]*GBRatio[i]*GenIner[i]);
+        // GenTorqueControllerType.append(word(turbineProperties.lookup("GenTorqueControllerType")));
+        // NacYawControllerType.append(word(turbineProperties.lookup("NacYawControllerType")));
+        // BladePitchControllerType.append(word(turbineProperties.lookup("BladePitchControllerType")));
+        // RotSpeedLimiter.append(bool(readBool(turbineProperties.lookup("RotSpeedLimiter"))));
+        // GenTorqueRateLimiter.append(bool(readBool(turbineProperties.lookup("GenTorqueRateLimiter"))));
+        // NacYawRateLimiter.append(bool(readBool(turbineProperties.lookup("NacYawRateLimiter"))));
+        // BladePitchRateLimiter.append(bool(readBool(turbineProperties.lookup("BladePitchRateLimiter"))));
+        // SpeedFilterCornerFrequency.append(scalar(readScalar(turbineProperties.lookup("SpeedFilterCornerFrequency"))));
 
 
-        RateLimitGenTorque.append(readScalar(turbineProperties.subDict("GenTorqueControllerParams").lookup("RateLimitGenTorque")));
-        if (GenTorqueControllerType[i] == "none")
-        {
-            // Read nothing.
-        }
-        else if (GenTorqueControllerType[i] == "fiveRegion")
-        {
-            CutInGenSpeed.append(readScalar(turbineProperties.subDict("GenTorqueControllerParams").lookup("CutInGenSpeed")));
-            Region2StartGenSpeed.append(readScalar(turbineProperties.subDict("GenTorqueControllerParams").lookup("Region2StartGenSpeed")));
-            Region2EndGenSpeed.append(readScalar(turbineProperties.subDict("GenTorqueControllerParams").lookup("Region2EndGenSpeed")));
-            CutInGenTorque.append(readScalar(turbineProperties.subDict("GenTorqueControllerParams").lookup("CutInGenTorque")));
-            RatedGenTorque.append(readScalar(turbineProperties.subDict("GenTorqueControllerParams").lookup("RatedGenTorque")));
-            RateLimitGenTorque.append(readScalar(turbineProperties.subDict("GenTorqueControllerParams").lookup("RateLimitGenTorque")));
-            KGen.append(readScalar(turbineProperties.subDict("GenTorqueControllerParams").lookup("KGen")));
-        }
-        else if (GenTorqueControllerType[i] == "speedTorqueTable")
-        {
-            SpeedTorqueTable.append(turbineProperties.subDict("GenTorqueControllerParams").lookup("SpeedTorqueTable"));
-            DynamicList<scalar> speedInt;
-            DynamicList<scalar> torqueInt;
+        // RateLimitGenTorque.append(readScalar(turbineProperties.subDict("GenTorqueControllerParams").lookup("RateLimitGenTorque")));
+        // if (GenTorqueControllerType[i] == "none")
+        // {
+        //     // Read nothing.
+        // }
+        // else if (GenTorqueControllerType[i] == "fiveRegion")
+        // {
+        //     CutInGenSpeed.append(readScalar(turbineProperties.subDict("GenTorqueControllerParams").lookup("CutInGenSpeed")));
+        //     Region2StartGenSpeed.append(readScalar(turbineProperties.subDict("GenTorqueControllerParams").lookup("Region2StartGenSpeed")));
+        //     Region2EndGenSpeed.append(readScalar(turbineProperties.subDict("GenTorqueControllerParams").lookup("Region2EndGenSpeed")));
+        //     CutInGenTorque.append(readScalar(turbineProperties.subDict("GenTorqueControllerParams").lookup("CutInGenTorque")));
+        //     RatedGenTorque.append(readScalar(turbineProperties.subDict("GenTorqueControllerParams").lookup("RatedGenTorque")));
+        //     RateLimitGenTorque.append(readScalar(turbineProperties.subDict("GenTorqueControllerParams").lookup("RateLimitGenTorque")));
+        //     KGen.append(readScalar(turbineProperties.subDict("GenTorqueControllerParams").lookup("KGen")));
+        // }
+        // else if (GenTorqueControllerType[i] == "speedTorqueTable")
+        // {
+        //     SpeedTorqueTable.append(turbineProperties.subDict("GenTorqueControllerParams").lookup("SpeedTorqueTable"));
+        //     DynamicList<scalar> speedInt;
+        //     DynamicList<scalar> torqueInt;
  
-            forAll(SpeedTorqueTable[i],j)
-            {
-                speedInt.append(SpeedTorqueTable[i][j][0]);
-                torqueInt.append(SpeedTorqueTable[i][j][1]);
-            }
+        //     forAll(SpeedTorqueTable[i],j)
+        //     {
+        //         speedInt.append(SpeedTorqueTable[i][j][0]);
+        //         torqueInt.append(SpeedTorqueTable[i][j][1]);
+        //     }
 
-            SpeedGenProfile.append(speedInt);
-            TorqueGenProfile.append(torqueInt);
+        //     SpeedGenProfile.append(speedInt);
+        //     TorqueGenProfile.append(torqueInt);
 
-            speedInt.clear();
-            torqueInt.clear();
-        }
+        //     speedInt.clear();
+        //     torqueInt.clear();
+        // }
         
        
 
-        RateLimitBladePitch.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("RateLimitBladePitch")));
-        if (BladePitchControllerType[i] == "none")
-        {
-            // Read nothing.
-        }
-        else if (BladePitchControllerType[i] == "PID")
-        {
-            PitchK.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchK")));
-            PitchMin.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchMin")));
-            PitchMax.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchMax")));
-            PitchControlKP.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchControlKP")));
-            PitchControlKI.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchControlKI")));
-            PitchControlKD.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchControlKD")));
-        }
+        // RateLimitBladePitch.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("RateLimitBladePitch")));
+        // if (BladePitchControllerType[i] == "none")
+        // {
+        //     // Read nothing.
+        // }
+        // else if (BladePitchControllerType[i] == "PID")
+        // {
+        //     PitchK.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchK")));
+        //     PitchMin.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchMin")));
+        //     PitchMax.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchMax")));
+        //     PitchControlKP.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchControlKP")));
+        //     PitchControlKI.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchControlKI")));
+        //     PitchControlKD.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchControlKD")));
+        // }
 
 
 
-        RateLimitNacYaw.append(readScalar(turbineProperties.subDict("NacYawControllerParams").lookup("RateLimitNacYaw")));
-        if (NacYawControllerType[i] == "none")
-        {
-            // Read nothing.
-        }
-        else if (NacYawControllerType[i] == "timeYawTable")
-        {
-        }
+        // RateLimitNacYaw.append(readScalar(turbineProperties.subDict("NacYawControllerParams").lookup("RateLimitNacYaw")));
+        // if (NacYawControllerType[i] == "none")
+        // {
+        //     // Read nothing.
+        // }
+        // else if (NacYawControllerType[i] == "timeYawTable")
+        // {
+        // }
 
 
 
 
-        AirfoilType.append(turbineProperties.lookup("Airfoils"));
+        // AirfoilType.append(turbineProperties.lookup("Airfoils"));
 
-        BladeData.append(turbineProperties.lookup("BladeData"));
+        // BladeData.append(turbineProperties.lookup("BladeData"));
 
-        DynamicList<scalar> station;
-        DynamicList<scalar> chord;
-        DynamicList<scalar> twist;
-        DynamicList<label> id;
+        // DynamicList<scalar> station;
+        // DynamicList<scalar> chord;
+        // DynamicList<scalar> twist;
+        // DynamicList<label> id;
 
 
-        forAll(BladeData[i], j)
-        {
-            station.append(BladeData[i][j][0]);
-            chord.append(BladeData[i][j][1]);
-            twist.append(BladeData[i][j][2]);
-            id.append(BladeData[i][j][3]);
-        }
+        // forAll(BladeData[i], j)
+        // {
+        //     station.append(BladeData[i][j][0]);
+        //     chord.append(BladeData[i][j][1]);
+        //     twist.append(BladeData[i][j][2]);
+        //     id.append(BladeData[i][j][3]);
+        // }
 
-        BladeStation.append(station);
-        BladeChord.append(chord);
-        BladeTwist.append(twist);
-        BladeAirfoilTypeID.append(id);
+        // BladeStation.append(station);
+        // BladeChord.append(chord);
+        // BladeTwist.append(twist);
+        // BladeAirfoilTypeID.append(id);
 
-        station.clear();
-        chord.clear();
-        twist.clear();
-        id.clear();
+        // station.clear();
+        // chord.clear();
+        // twist.clear();
+        // id.clear();
     }
 
     
@@ -357,48 +357,48 @@ horizontalAxisWindTurbinesADMUniform::horizontalAxisWindTurbinesADMUniform
 
     // Catalog the various distinct types of airfoils used in the various
     // distinct types of turbines.
-    int numAirfoilsDistinct = 1;
-    {
-        airfoilTypesDistinct.append(AirfoilType[0][0]);
-        forAll(AirfoilType,i)
-        {
-            forAll(AirfoilType[i],j)
-            {
-                bool flag = false;
-                for(int k = 0; k < numAirfoilsDistinct; k++)
-                {
-                    if(AirfoilType[i][j] == airfoilTypesDistinct[k])
-                    {
-                        flag = true;
-                    }
-                }
-                if(flag == false)
-                {
-                    numAirfoilsDistinct++;
-                    airfoilTypesDistinct.append(AirfoilType[i][j]);
-                }
-            }
-        }
-    }
+    // int numAirfoilsDistinct = 1;
+    // {
+    //     airfoilTypesDistinct.append(AirfoilType[0][0]);
+    //     forAll(AirfoilType,i)
+    //     {
+    //         forAll(AirfoilType[i],j)
+    //         {
+    //             bool flag = false;
+    //             for(int k = 0; k < numAirfoilsDistinct; k++)
+    //             {
+    //                 if(AirfoilType[i][j] == airfoilTypesDistinct[k])
+    //                 {
+    //                     flag = true;
+    //                 }
+    //             }
+    //             if(flag == false)
+    //             {
+    //                 numAirfoilsDistinct++;
+    //                 airfoilTypesDistinct.append(AirfoilType[i][j]);
+    //             }
+    //         }
+    //     }
+    // }
 
 
 
     // Reassign airfoil type IDs to blades of each turbine based on the global
     // distinct list of airfoils.
-    forAll(BladeAirfoilTypeID,i)
-    {
-        forAll(BladeAirfoilTypeID[i],j)
-        {
-            for(int k = 0; k < numAirfoilsDistinct; k++)
-            {
-                if(AirfoilType[i][BladeAirfoilTypeID[i][j]] == airfoilTypesDistinct[k])
-                {
-                    BladeAirfoilTypeID[i][j] = k;
-                    k = numAirfoilsDistinct;
-                }
-            }
-        }
-    }
+    // forAll(BladeAirfoilTypeID,i)
+    // {
+    //     forAll(BladeAirfoilTypeID[i],j)
+    //     {
+    //         for(int k = 0; k < numAirfoilsDistinct; k++)
+    //         {
+    //             if(AirfoilType[i][BladeAirfoilTypeID[i][j]] == airfoilTypesDistinct[k])
+    //             {
+    //                 BladeAirfoilTypeID[i][j] = k;
+    //                 k = numAirfoilsDistinct;
+    //             }
+    //         }
+    //     }
+    // }
    
 
 
@@ -406,43 +406,43 @@ horizontalAxisWindTurbinesADMUniform::horizontalAxisWindTurbinesADMUniform
 
     // For each distinct airfoil, read in the lift and drag versus angle
     // of attack data.
-    for(int i = 0; i < numAirfoilsDistinct; i++)
-    {
-        // Declare the airfoilsProperties dictionary for the ith airfoil.
-        IOdictionary airfoilProperties
-        (
-            IOobject
-            (
-                airfoilTypesDistinct[i],
-                runTime_.constant(),"airfoilProperties",
-                mesh_,
-                IOobject::MUST_READ,
-                IOobject::NO_WRITE
-            )
-        );
+    // for(int i = 0; i < numAirfoilsDistinct; i++)
+    // {
+    //     // Declare the airfoilsProperties dictionary for the ith airfoil.
+    //     IOdictionary airfoilProperties
+    //     (
+    //         IOobject
+    //         (
+    //             airfoilTypesDistinct[i],
+    //             runTime_.constant(),"airfoilProperties",
+    //             mesh_,
+    //             IOobject::MUST_READ,
+    //             IOobject::NO_WRITE
+    //         )
+    //     );
 
-        // Read in the data.
-        airfoilData.append(airfoilProperties.lookup("airfoilData"));
+    //     // Read in the data.
+    //     airfoilData.append(airfoilProperties.lookup("airfoilData"));
 
-        DynamicList<scalar> alphaInt;
-        DynamicList<scalar> ClInt;
-        DynamicList<scalar> CdInt;
+    //     DynamicList<scalar> alphaInt;
+    //     DynamicList<scalar> ClInt;
+    //     DynamicList<scalar> CdInt;
 
-        forAll(airfoilData[i],j)
-        {
-            alphaInt.append(airfoilData[i][j][0]);
-            ClInt.append(airfoilData[i][j][1]);
-            CdInt.append(airfoilData[i][j][2]);
-        }
+    //     forAll(airfoilData[i],j)
+    //     {
+    //         alphaInt.append(airfoilData[i][j][0]);
+    //         ClInt.append(airfoilData[i][j][1]);
+    //         CdInt.append(airfoilData[i][j][2]);
+    //     }
 
-        airfoilAlpha.append(alphaInt);
-        airfoilCl.append(ClInt);
-        airfoilCd.append(CdInt);
+    //     airfoilAlpha.append(alphaInt);
+    //     airfoilCl.append(ClInt);
+    //     airfoilCd.append(CdInt);
 
-        alphaInt.clear();
-        ClInt.clear();
-        CdInt.clear();
-    }
+    //     alphaInt.clear();
+    //     ClInt.clear();
+    //     CdInt.clear();
+    // }
 
 
 
@@ -461,22 +461,22 @@ horizontalAxisWindTurbinesADMUniform::horizontalAxisWindTurbinesADMUniform
     // Convert quantities in degrees into radians (dynamic lists
     // have to be done in loops).
     azimuth   = degRad * azimuth;
-    rotSpeed  = rpmRadSec * rotSpeed;
-    rotSpeedF = rpmRadSec * rotSpeedF;
+    // rotSpeed  = rpmRadSec * rotSpeed;
+    // rotSpeedF = rpmRadSec * rotSpeedF;
     nacYaw    = degRad * nacYaw;
-    ShftTilt  = degRad * ShftTilt;
-    SpeedFilterCornerFrequency = rpsRadSec * SpeedFilterCornerFrequency;
-    RatedRotSpeed = rpmRadSec * RatedRotSpeed;
-    PitchK = degRad * PitchK;
-    PitchMin = degRad * PitchMin;
-    PitchMax = degRad * PitchMax;
+    nacTilt   = degRad * nacTilt;
+    // ShftTilt  = degRad * ShftTilt;
+    // SpeedFilterCornerFrequency = rpsRadSec * SpeedFilterCornerFrequency;
+    // RatedRotSpeed = rpmRadSec * RatedRotSpeed;
+    // PitchK = degRad * PitchK;
+    // PitchMin = degRad * PitchMin;
+    // PitchMax = degRad * PitchMax;
     forAll(PreCone,i)
     {
         PreCone[i] = degRad * PreCone[i];
     }
 
     
-
 
     // Calculate tower shaft intersection and rotor apex locations. (The
     // i-index is at the turbine array level for each turbine and the j-
@@ -489,8 +489,8 @@ horizontalAxisWindTurbinesADMUniform::horizontalAxisWindTurbinesADMUniform
         towerShaftIntersect.append(baseLocation[i]);
         towerShaftIntersect[i].z() = towerShaftIntersect[i].z() + TowerHt[j] + Twr2Shft[j];
         rotorApex.append(towerShaftIntersect[i]);
-        rotorApex[i].x() = rotorApex[i].x() + ((OverHang[j] + UndSling[j]) * Foam::cos(ShftTilt[j]));
-        rotorApex[i].z() = rotorApex[i].z() +  (OverHang[j] + UndSling[j]) * Foam::sin(ShftTilt[j]);
+        rotorApex[i].x() = rotorApex[i].x() + ((OverHang[j] + UndSling[j]) * Foam::cos(nacTilt[i]));
+        rotorApex[i].z() = rotorApex[i].z() +  (OverHang[j] + UndSling[j]) * Foam::sin(nacTilt[i]);
     }
 
 
@@ -579,7 +579,7 @@ horizontalAxisWindTurbinesADMUniform::horizontalAxisWindTurbinesADMUniform
 
         // Calculate how many azimuthal sections are at each radial station
         bladeRadius.append(List<scalar>(nRadial[i],0.0));
-        solidity.append(List<scalar>(nRadial[i],0.0));
+        // solidity.append(List<scalar>(nRadial[i],0.0));
         nAzimuth.append(List<int>(nRadial[i],0));
         scalar dist = 0.0;
         for(int m = 0; m < nRadial[i]; m++)
@@ -610,11 +610,7 @@ horizontalAxisWindTurbinesADMUniform::horizontalAxisWindTurbinesADMUniform
             // Calculate the solidity factor at this radius.
           //scalar chord = interpolate(bladeRadius[i][m], BladeStation[j], BladeChord[j]);
           //solidity[i][m] = NumBl[j]*chord / (2.0 * Foam::constant::mathematical::pi * bladeRadius[i][m] * Foam::cos(PreCone[j][0]));
-            solidity[i][m] = scalar(NumBl[j]) / scalar(nAzimuth[i][m]);
-
-            Info << "m = " << m << endl;
-            Info << "Azimuth = " << nAzimuth[i][m] << endl;
-            
+            // solidity[i][m] = scalar(NumBl[j]) / scalar(nAzimuth[i][m]);            
         }
 
 
@@ -622,32 +618,32 @@ horizontalAxisWindTurbinesADMUniform::horizontalAxisWindTurbinesADMUniform
         bladePoints.append(List<List<vector> >(nRadial[i]));
         bladePointsPerturbVector.append(List<List<vector> >(nRadial[i]));
         elementAzimuth.append(List<List<scalar> >(nRadial[i]));
-        bladeForce.append(List<List<vector> >(nRadial[i]));
+        // bladeForce.append(List<List<vector> >(nRadial[i]));
         bladeForceSimplified.append(List<List<vector> >(nRadial[i]));
         bladeAlignedVectors.append(List<List<List<vector > > >(nRadial[i]));
         windVectors.append(List<List<vector> >(nRadial[i]));
-        alpha.append(List<List<scalar> >(nRadial[i]));
-        Vmag.append(List<List<scalar> >(nRadial[i]));
+        // alpha.append(List<List<scalar> >(nRadial[i]));
+        // Vmag.append(List<List<scalar> >(nRadial[i]));
         VmagN.append(List<List<scalar> >(nRadial[i]));
-        Cl.append(List<List<scalar> >(nRadial[i]));
-        Cd.append(List<List<scalar> >(nRadial[i]));
-        lift.append(List<List<scalar> >(nRadial[i]));
-        drag.append(List<List<scalar> >(nRadial[i]));
-        axialForce.append(List<List<scalar> >(nRadial[i]));
+        // Cl.append(List<List<scalar> >(nRadial[i]));
+        // Cd.append(List<List<scalar> >(nRadial[i]));
+        // lift.append(List<List<scalar> >(nRadial[i]));
+        // drag.append(List<List<scalar> >(nRadial[i]));
+        // axialForce.append(List<List<scalar> >(nRadial[i]));
         axialForceSimplified.append(List<List<scalar> >(nRadial[i]));
-        tangentialForce.append(List<List<scalar> >(nRadial[i]));
+        // tangentialForce.append(List<List<scalar> >(nRadial[i]));
         tangentialForceSimplified.append(List<List<scalar> >(nRadial[i]));
         minDisCellID.append(List<List<label> >(nRadial[i]));
         deltaNacYaw.append(0.0);
         deltaAzimuth.append(0.0);
-        thrust.append(0.0);
+        // thrust.append(0.0);
         VmagNAvg.append(0.0);
         thrustSimplified.append(0.0);
-        torqueRotor.append(0.0);
+        // torqueRotor.append(0.0);
         torqueRotorSimplified.append(0.0);
         TotalForceTurbineSimplified.append(0.0);
-        powerRotor.append(0.0);
-        powerGenerator.append(0.0);
+        // powerRotor.append(0.0);
+        // powerGenerator.append(0.0);
         powerRotorSimplified.append(0.0);
         for(int m = 0; m < nRadial[i]; m++)
         {
@@ -655,7 +651,7 @@ horizontalAxisWindTurbinesADMUniform::horizontalAxisWindTurbinesADMUniform
             bladePoints[i][m].append(List<vector>(nAzimuth[i][m],vector::zero));
             bladePointsPerturbVector[i][m].append(List<vector>(nAzimuth[i][m],vector::zero));
             elementAzimuth[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
-            bladeForce[i][m].append(List<vector>(nAzimuth[i][m],vector::zero));
+            // bladeForce[i][m].append(List<vector>(nAzimuth[i][m],vector::zero));
             bladeForceSimplified[i][m].append(List<vector>(nAzimuth[i][m],vector::zero));
             bladeAlignedVectors[i][m].append(List<List<vector> >(nAzimuth[i][m]));
             for(int n = 0; n < nAzimuth[i][m]; n++)
@@ -663,16 +659,16 @@ horizontalAxisWindTurbinesADMUniform::horizontalAxisWindTurbinesADMUniform
                 bladeAlignedVectors[i][m][n].append(List<vector>(3,vector::zero));
             }
             windVectors[i][m].append(List<vector>(nAzimuth[i][m],vector::zero));
-            alpha[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
-            Vmag[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
+            // alpha[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
+            // Vmag[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
             VmagN[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
-            Cl[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
-            Cd[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
-            lift[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
-            drag[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
-            axialForce[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
+            // Cl[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
+            // Cd[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
+            // lift[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
+            // drag[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
+            // axialForce[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
             axialForceSimplified[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
-            tangentialForce[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
+            // tangentialForce[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
             tangentialForceSimplified[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
             minDisCellID[i][m].append(List<label>(nAzimuth[i][m],-1));
         }
@@ -680,27 +676,27 @@ horizontalAxisWindTurbinesADMUniform::horizontalAxisWindTurbinesADMUniform
 
 
         windVectorsSecAvg.append(List<List<vector> >(nAvgSector[i]));
-        alphaSecAvg.append(List<List<scalar> >(nAvgSector[i]));
-        VmagSecAvg.append(List<List<scalar> >(nAvgSector[i]));
+        // alphaSecAvg.append(List<List<scalar> >(nAvgSector[i]));
+        // VmagSecAvg.append(List<List<scalar> >(nAvgSector[i]));
         VmagNSecAvg.append(List<List<scalar> >(nAvgSector[i]));
-        ClSecAvg.append(List<List<scalar> >(nAvgSector[i]));
-        CdSecAvg.append(List<List<scalar> >(nAvgSector[i]));
-        liftSecAvg.append(List<List<scalar> >(nAvgSector[i]));
-        dragSecAvg.append(List<List<scalar> >(nAvgSector[i]));
-        axialForceSecAvg.append(List<List<scalar> >(nAvgSector[i]));
-        tangentialForceSecAvg.append(List<List<scalar> >(nAvgSector[i]));
+        // // ClSecAvg.append(List<List<scalar> >(nAvgSector[i]));
+        // // CdSecAvg.append(List<List<scalar> >(nAvgSector[i]));
+        // // liftSecAvg.append(List<List<scalar> >(nAvgSector[i]));
+        // // dragSecAvg.append(List<List<scalar> >(nAvgSector[i]));
+        // axialForceSecAvg.append(List<List<scalar> >(nAvgSector[i]));
+        // tangentialForceSecAvg.append(List<List<scalar> >(nAvgSector[i]));
         for(int m = 0; m < nAvgSector[i]; m++)
         {
             windVectorsSecAvg[i][m].append(List<vector>(nRadial[i],vector::zero));
-            alphaSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
-            VmagSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
+        //     alphaSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
+        //     VmagSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
             VmagNSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
-            ClSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
-            CdSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
-            liftSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
-            dragSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
-            axialForceSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
-            tangentialForceSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
+        //     ClSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
+        //     CdSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
+        //     liftSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
+        //     dragSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
+        //     axialForceSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
+        //     tangentialForceSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
         }
 
 
@@ -710,7 +706,7 @@ horizontalAxisWindTurbinesADMUniform::horizontalAxisWindTurbinesADMUniform
         // position before doing a global rotation to the initial azimuth of
         // the rotor.  Also calculate the radius of each point (not including coning).
         vector root = rotorApex[i];
-        scalar beta = PreCone[j][0] - ShftTilt[j];
+        scalar beta = PreCone[j][0] - nacTilt[i];
         root.x() = root.x() + HubRad[j]*Foam::sin(beta);
         root.z() = root.z() + HubRad[j]*Foam::cos(beta);
         dist = 0.0;
@@ -770,8 +766,8 @@ horizontalAxisWindTurbinesADMUniform::horizontalAxisWindTurbinesADMUniform
     yawNacelle();
 
     // Rotate the rotor to initial azimuth angle.
-    deltaAzimuth =  azimuth;
-    rotateBlades();  
+    // deltaAzimuth =  azimuth;
+    // rotateBlades();  
 
     // Find out which processors control each actuator line point.
     findControlProcNo();
@@ -793,11 +789,11 @@ horizontalAxisWindTurbinesADMUniform::horizontalAxisWindTurbinesADMUniform
 
 // * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * * //
 
-void horizontalAxisWindTurbinesADMUniform::rotateBlades()
-{  
+// void horizontalAxisWindTurbinesADMUniform::rotateBlades()
+// {  
     // Perform rotation turbine by turbine.
-    forAll(uvShaft, i)
-    {	
+    // forAll(uvShaft, i)
+    // {	
         // Check the rotation direction first and set the local delta azimuth
 	// variable accordingly.
       //scalar deltaAzimuthI = 0.0;
@@ -821,17 +817,17 @@ void horizontalAxisWindTurbinesADMUniform::rotateBlades()
 
 	// Calculate the new azimuth angle and make sure it isn't
         // bigger than 2*pi.
-        if (pastFirstTimeStep)
-        {
-	    azimuth[i] = azimuth[i] + deltaAzimuth[i];
-            if (azimuth[i] >= 2.0 * Foam::constant::mathematical::pi)
-            {
-                azimuth[i] -= 2.0 * Foam::constant::mathematical::pi;
-            }
-        }
-    }
-}
-        
+        // if (pastFirstTimeStep)
+        // {
+	    // azimuth[i] = azimuth[i] + deltaAzimuth[i];
+            // if (azimuth[i] >= 2.0 * Foam::constant::mathematical::pi)
+            // {
+                // azimuth[i] -= 2.0 * Foam::constant::mathematical::pi;
+            // }
+        // }
+    // }
+// }
+
 
 void horizontalAxisWindTurbinesADMUniform::yawNacelle()
 {
@@ -868,179 +864,179 @@ void horizontalAxisWindTurbinesADMUniform::yawNacelle()
 }
 
 
-void horizontalAxisWindTurbinesADMUniform::computeRotSpeed()
-{
+// void horizontalAxisWindTurbinesADMUniform::computeRotSpeed()
+// {
     // Proceed turbine by turbine.
-    forAll(rotSpeed, i)
-    {
+    // forAll(rotSpeed, i)
+    // {
         // Get the turbine type index.
-        int j = turbineTypeID[i];
+        // int j = turbineTypeID[i];
 
         // If the generator torque and blade pitch controllers are both set to "none", then
         // the rotor speed will remain fixed at its initial speed.
-        if ((GenTorqueControllerType[j] == "none") && (BladePitchControllerType[j] == "none"))
-        {
+        // if ((GenTorqueControllerType[j] == "none") && (BladePitchControllerType[j] == "none"))
+        // {
             // Do nothing.
-        }
+        // }
 
         // Otherwise numerically solve the dynamics of the rotor to compute the new rotor speed
         // based on the summation of aerodynamic and generator torque on the rotor.
-        else
-        {
-            rotSpeed[i] += (dt/DriveTrainIner[j])*(GBEfficiency[j]*torqueRotor[i]*fluidDensity[i] - GBRatio[j]*torqueGen[i]);
-        }
+        // else
+        // {
+            // rotSpeed[i] += (dt/DriveTrainIner[j])*(GBEfficiency[j]*torqueRotor[i]*fluidDensity[i] - GBRatio[j]*torqueGen[i]);
+        // }
 
 
         // Limit the rotor speed to be positive and such that the generator does not turn
         // faster than rated.
-        if (RotSpeedLimiter[j])
-        {
-            # include "limiters/rotSpeedLimiter.H"
-        }
+        // if (RotSpeedLimiter[j])
+        // {
+            // # include "limiters/rotSpeedLimiter.H"
+        // }
  
         // Compute the change in blade azimuth angle based on the time step and current rotor speed.
-        deltaAzimuth[i] = rotSpeed[i] * dt;
+        // deltaAzimuth[i] = rotSpeed[i] * dt;
 
-    }
-}
+    // }
+// }
 
 
-void horizontalAxisWindTurbinesADMUniform::filterRotSpeed()
-{
+// void horizontalAxisWindTurbinesADMUniform::filterRotSpeed()
+// {
+//     // Proceed turbine by turbine.
+//     forAll(rotSpeedF, i)
+//     {
+//         // Get the turbine type index.
+//         int j = turbineTypeID[i];
+
+//         // Compute the filtering coefficient based on the corner frequency and time step.
+//         scalar alpha = exp(-dt * SpeedFilterCornerFrequency[j]);
+
+//         // Apply a simple recursive, single-pole, low-pass filter.
+//         rotSpeedF[i] = (1.0 - alpha)*rotSpeed[i] + alpha*rotSpeedF[i];
+//     }
+// }
+
+
+// void horizontalAxisWindTurbinesADMUniform::controlGenTorque()
+// {
+//     // Proceed turbine by turbine.
+//     forAll(torqueGen, i)
+//     {
+//         // Get the turbine type index.
+//         int j = turbineTypeID[i];
+
+//         // Get the current filtered generator speed.
+//         scalar genSpeedF = (rotSpeedF[i]/rpmRadSec)*GBRatio[j];
+
+
+//         // Initialize the commanded generator torque variable;
+//         scalar torqueGenCommanded = torqueGen[i];
+
+
+
+//         // Apply a controller to update the rotor speed.
+// 	if (GenTorqueControllerType[j] == "none")
+//         {
+//             #include "controllers/genTorqueControllers/none.H"
+//         }
+
+// 	else if (GenTorqueControllerType[j] == "fiveRegion")
+//         {
+//             #include "controllers/genTorqueControllers/fiveRegion.H"
+// 	}
+
+//         else if (GenTorqueControllerType[j] == "speedTorqueTable")
+//         {
+//             #include "controllers/genTorqueControllers/speedTorqueTable.H"
+//         }
+
+//         // Limit the change in generator torque.
+//         if (GenTorqueRateLimiter[j])
+//         {
+//             #include "limiters/genTorqueRateLimiter.H"
+//         }
+
+//         // Update the pitch array.
+//         torqueGen[i] = torqueGenCommanded;
+//     }
+// }
+        
+
+// void horizontalAxisWindTurbinesADMUniform::controlNacYaw()
+// {
+//     // Proceed turbine by turbine.
+//     forAll(deltaNacYaw, i)
+//     {
+//         // Get the turbine type index.
+//         int j = turbineTypeID[i];
+
+
+        
+//         // Apply a controller to update the nacelle yaw position.
+//         if (NacYawControllerType[j] == "none")
+//         {
+//             // Do nothing.
+// 	    deltaNacYaw[i] = 0.0;
+//         }
+
+//         else if (NacYawControllerType[j] == "simple")
+//         {
+//             // Placeholder for when this is implemented.
+//         }
+        
+//         else if (NacYawControllerType[j] == "timeYawTable")
+//         {
+//         }
+
+
+        
+//         // Limit the change in nacelle yaw angle.
+//         if (NacYawRateLimiter[j])
+//         {
+//         }
+
+//     }
+// }
+        
+
+// void horizontalAxisWindTurbinesADMUniform::controlBladePitch()
+// {
     // Proceed turbine by turbine.
-    forAll(rotSpeedF, i)
-    {
-        // Get the turbine type index.
-        int j = turbineTypeID[i];
-
-        // Compute the filtering coefficient based on the corner frequency and time step.
-        scalar alpha = exp(-dt * SpeedFilterCornerFrequency[j]);
-
-        // Apply a simple recursive, single-pole, low-pass filter.
-        rotSpeedF[i] = (1.0 - alpha)*rotSpeed[i] + alpha*rotSpeedF[i];
-    }
-}
-
-
-void horizontalAxisWindTurbinesADMUniform::controlGenTorque()
-{
-    // Proceed turbine by turbine.
-    forAll(torqueGen, i)
-    {
-        // Get the turbine type index.
-        int j = turbineTypeID[i];
-
-        // Get the current filtered generator speed.
-        scalar genSpeedF = (rotSpeedF[i]/rpmRadSec)*GBRatio[j];
-
-
-        // Initialize the commanded generator torque variable;
-        scalar torqueGenCommanded = torqueGen[i];
-
-
-
-        // Apply a controller to update the rotor speed.
-	if (GenTorqueControllerType[j] == "none")
-        {
-            #include "controllers/genTorqueControllers/none.H"
-        }
-
-	else if (GenTorqueControllerType[j] == "fiveRegion")
-        {
-            #include "controllers/genTorqueControllers/fiveRegion.H"
-	}
-
-        else if (GenTorqueControllerType[j] == "speedTorqueTable")
-        {
-            #include "controllers/genTorqueControllers/speedTorqueTable.H"
-        }
-
-        // Limit the change in generator torque.
-        if (GenTorqueRateLimiter[j])
-        {
-            #include "limiters/genTorqueRateLimiter.H"
-        }
-
-        // Update the pitch array.
-        torqueGen[i] = torqueGenCommanded;
-    }
-}
-        
-
-void horizontalAxisWindTurbinesADMUniform::controlNacYaw()
-{
-    // Proceed turbine by turbine.
-    forAll(deltaNacYaw, i)
-    {
-        // Get the turbine type index.
-        int j = turbineTypeID[i];
-
-
-        
-        // Apply a controller to update the nacelle yaw position.
-        if (NacYawControllerType[j] == "none")
-        {
-            // Do nothing.
-	    deltaNacYaw[i] = 0.0;
-        }
-
-        else if (NacYawControllerType[j] == "simple")
-        {
-            // Placeholder for when this is implemented.
-        }
-        
-        else if (NacYawControllerType[j] == "timeYawTable")
-        {
-        }
-
-
-        
-        // Limit the change in nacelle yaw angle.
-        if (NacYawRateLimiter[j])
-        {
-        }
-
-    }
-}
-        
-
-void horizontalAxisWindTurbinesADMUniform::controlBladePitch()
-{
-    // Proceed turbine by turbine.
-    forAll(pitch, i)
-    {
+    // forAll(pitch, i)
+    // {
 
         // Get the turbine type index.
-        int j = turbineTypeID[i];
+        // // int j = turbineTypeID[i];
         
-        // Initialize the gain scheduling variable.
-        scalar GK = 0.0;
+        // // Initialize the gain scheduling variable.
+        // scalar GK = 0.0;
 
-        // Initialize the commanded pitch variable.
-        scalar pitchCommanded = pitch[i]*degRad;
+        // // Initialize the commanded pitch variable.
+        // scalar pitchCommanded = pitch[i]*degRad;
 
 
-        // Apply a controller to update the blade pitch position.
-        if (BladePitchControllerType[j] == "none")
-        {
-            #include "controllers/bladePitchControllers/none.H"
-        }
+        // // Apply a controller to update the blade pitch position.
+        // if (BladePitchControllerType[j] == "none")
+        // {
+//         //     #include "controllers/bladePitchControllers/none.H"
+//         }
 
-        else if (BladePitchControllerType[j] == "PID")
-        {
-            #include "controllers/bladePitchControllers/PID.H"
-        }
+//         else if (BladePitchControllerType[j] == "PID")
+//         {
+//             #include "controllers/bladePitchControllers/PID.H"
+//         }
 
-        // Apply pitch rate limiter.
-        if (BladePitchRateLimiter[j])
-        {
-            #include "limiters/bladePitchRateLimiter.H"
-        }
+//         // Apply pitch rate limiter.
+//         if (BladePitchRateLimiter[j])
+//         {
+//             #include "limiters/bladePitchRateLimiter.H"
+//         }
 
-        // Update the pitch array.
-        pitch[i] = pitchCommanded/degRad;
-    }
-}
+//         // Update the pitch array.
+//         pitch[i] = pitchCommanded/degRad;
+//     }
+// }
 
 
 void horizontalAxisWindTurbinesADMUniform::findControlProcNo()
@@ -1203,10 +1199,14 @@ void horizontalAxisWindTurbinesADMUniform::computeWindVectors()
 void horizontalAxisWindTurbinesADMUniform::computeBladeForce()
 {
     // Take the x,y,z wind vectors and project them into the blade coordinate system.
+    // In addition, take the normal average velocity over the rotor area per turbine.
     // Proceed turbine by turbine.
     forAll(windVectors, i)
     {
         int n = turbineTypeID[i];
+        
+        // Set the total average normal velocity of the turbine to zero. 
+        VmagNAvg[i] = 0; 
 
         // Proceed blade by blade.
         forAll(windVectors[i], j)
@@ -1246,13 +1246,14 @@ void horizontalAxisWindTurbinesADMUniform::computeBladeForce()
                 windVectors[i][j][k] = vector::zero;
 
                 // Now put the velocity in that cell into blade-oriented coordinates and add on the
-                // velocity due to blade rotation.
+                // velocity due to blade rotation. (rot neglected in uniform actuator disk model)
                 windVectors[i][j][k].x() = (bladeAlignedVectors[i][j][k][0] & windVectorsInt);
                 windVectors[i][j][k].y() = (bladeAlignedVectors[i][j][k][1] & windVectorsInt); // + (rotSpeed[i] * bladeRadius[i][j] * cos(PreCone[n][0]));
                 windVectors[i][j][k].z() = (bladeAlignedVectors[i][j][k][2] & windVectorsInt);
 
                 // Find the AVERAGE velocity magnitude compose of only the axial flow
-                VmagNAvg[i] += windVectors[i][j][k].x() / (scalar(totDiskPoints[i]));
+                VmagN[i][j][k] = windVectors[i][j][k].x();
+                VmagNAvg[i] += VmagN[i][j][k] / (scalar(totDiskPoints[i]));
             }
         }
     }
@@ -1399,10 +1400,10 @@ void horizontalAxisWindTurbinesADMUniform::computeBladeForce()
                 tangentialForceSimplified[i][j][k] = bladeForceSimplified[i][j][k] & bladeAlignedVectors[i][j][k][1];
 
                 // Add this blade element's contribution to thrust to the total turbine thrust.
-                thrustSimplified[i] += axialForceSimplified[i][j][k] * solidity[i][j];
+                thrustSimplified[i] += axialForceSimplified[i][j][k];
 
                 // Add this blade element's contribution to aerodynamic torque to the total turbine aerodynamic torque.
-                torqueRotorSimplified[i] += tangentialForceSimplified[i][j][k] * solidity[i][j] * bladeRadius[i][j] * cos(PreCone[m][0]);
+                torqueRotorSimplified[i] += tangentialForceSimplified[i][j][k] * bladeRadius[i][j] * cos(PreCone[m][0]);
 
             }
         }
@@ -1425,7 +1426,7 @@ void horizontalAxisWindTurbinesADMUniform::computeBodyForce()
     forAll(bladeForceSimplified, i)
     {
         
-        int n = turbineTypeID[i];
+        //int n = turbineTypeID[i];
 
         // Proceed to compute body forces for turbine i only if there are sphere cells on this processor for this turbine.
         if (sphereCells[i].size() > 0)
@@ -1442,11 +1443,11 @@ void horizontalAxisWindTurbinesADMUniform::computeBodyForce()
                         scalar dis = mag(mesh_.C()[sphereCells[i][m]] - bladePoints[i][j][k]);
                         if (dis <= projectionRadius[i])
                         {
-                            bodyForce[sphereCells[i][m]] += bladeForceSimplified[i][j][k] * solidity[i][j] * (Foam::exp(-Foam::sqr(dis/epsilon[i]))/(Foam::pow(epsilon[i],3)*Foam::pow(Foam::constant::mathematical::pi,1.5)));
-                            thrustBodyForceSum += (-bladeForceSimplified[i][j][k] * solidity[i][j] * (Foam::exp(-Foam::sqr(dis/epsilon[i]))/(Foam::pow(epsilon[i],3)*Foam::pow(Foam::constant::mathematical::pi,1.5))) *
+                            bodyForce[sphereCells[i][m]] += bladeForceSimplified[i][j][k] * (Foam::exp(-Foam::sqr(dis/epsilon[i]))/(Foam::pow(epsilon[i],3)*Foam::pow(Foam::constant::mathematical::pi,1.5)));
+                            thrustBodyForceSum += (-bladeForceSimplified[i][j][k] * (Foam::exp(-Foam::sqr(dis/epsilon[i]))/(Foam::pow(epsilon[i],3)*Foam::pow(Foam::constant::mathematical::pi,1.5))) *
                                                     mesh_.V()[sphereCells[i][m]]) & uvShaft[i];
-                            torqueBodyForceSum += ( bladeForceSimplified[i][j][k] * solidity[i][j] * (Foam::exp(-Foam::sqr(dis/epsilon[i]))/(Foam::pow(epsilon[i],3)*Foam::pow(Foam::constant::mathematical::pi,1.5))) * 
-                                                    bladeRadius[i][j] * cos(PreCone[n][0]) * mesh_.V()[sphereCells[i][m]]) & bladeAlignedVectors[i][j][k][1];
+                            torqueBodyForceSum += ( bladeForceSimplified[i][j][k] * (Foam::exp(-Foam::sqr(dis/epsilon[i]))/(Foam::pow(epsilon[i],3)*Foam::pow(Foam::constant::mathematical::pi,1.5))) * 
+                                                    bladeRadius[i][j] * mesh_.V()[sphereCells[i][m]]) & bladeAlignedVectors[i][j][k][1];
                         }
                     }
                 }  
@@ -1466,11 +1467,11 @@ void horizontalAxisWindTurbinesADMUniform::computeBodyForce()
 
 void horizontalAxisWindTurbinesADMUniform::computeSectorAverage()
 {
-    forAll(alphaSecAvg, i)
+    forAll(windVectorsSecAvg, i)
     {
-        forAll(alphaSecAvg[i], j)
+        forAll(windVectorsSecAvg[i], j)
         {
-            forAll(alphaSecAvg[i][j], k)
+            forAll(windVectorsSecAvg[i][j], k)
             {
                 windVectorsSecAvg[i][j][k] = vector::zero;
                 // alphaSecAvg[i][j][k] = 0.0;
@@ -1678,40 +1679,41 @@ void horizontalAxisWindTurbinesADMUniform::update()
     time = runTime_.timeName();
     t = runTime_.value();
 
-    if(bladeUpdateType[0] == "oldPosition")
-    {
+    // if(bladeUpdateType[0] == "oldPosition")
+    // {
         // Find out which processor controls which actuator point,
         // and with that informatio sample the wind at the actuator
         // points.
       //findControlProcNo();
-        computeWindVectors();
+        // computeWindVectors();
 
         // Update the rotor state.
-        filterRotSpeed();
-        controlGenTorque();
-        controlBladePitch();
-        controlNacYaw();
-        computeRotSpeed();
-        rotateBlades();
-        yawNacelle();
-    }
-    else if(bladeUpdateType[0] == "newPosition")
-    {
+        // filterRotSpeed();
+        // controlGenTorque();
+        // controlBladePitch();
+        // controlNacYaw();
+        // computeRotSpeed();
+        // rotateBlades();
+        // yawNacelle();
+    // }
+    // else if(bladeUpdateType[0] == "newPosition")
+    // {
         // Update the rotor state.
-        filterRotSpeed();
-        controlGenTorque();
-        controlBladePitch();
-        controlNacYaw();
-        computeRotSpeed();
-        rotateBlades();
-        yawNacelle();
+        // filterRotSpeed();
+        // controlGenTorque();
+        // controlBladePitch();
+        // controlNacYaw();
+        // computeRotSpeed();
+        // rotateBlades();
+        // yawNacelle();
 
         // Find out which processor controls which actuator point,
         // and with that information sample the wind at the actuator
         // points.
       //findControlProcNo();
-        computeWindVectors();
-    }
+        // computeWindVectors();
+    // }
+    computeWindVectors();
 
     // Compute the blade forces.
     computeBladeForce();
@@ -1894,7 +1896,7 @@ void horizontalAxisWindTurbinesADMUniform::printOutputFiles()
 {
     if (Pstream::master())
     {
-        forAll(alphaSecAvg,i)
+        forAll(windVectorsSecAvg,i)
         {
             // Write out time and delta t.
             // *torqueRotorFile_ << i << " " << time << " " << dt << " ";
@@ -1927,7 +1929,7 @@ void horizontalAxisWindTurbinesADMUniform::printOutputFiles()
             // *nacYawFile_ << standardToCompass(nacYaw[i]/degRad) << endl;
 
             // Proceed sector by sector.
-            forAll(alphaSecAvg[i], j)
+            forAll(windVectorsSecAvg[i], j)
             {
                 // Write out time and delta t.
                 // *alphaFile_ << i << " " << j << " " << time << " " << dt << " ";
@@ -1943,7 +1945,7 @@ void horizontalAxisWindTurbinesADMUniform::printOutputFiles()
                 // *axialForceFile_ << i << " " << j << " " <<  time << " " << dt << " ";
                 // *tangentialForceFile_ << i << " " << j << " " <<  time << " " << dt << " ";                
 
-                forAll(alphaSecAvg[i][j], k)
+                forAll(windVectorsSecAvg[i][j], k)
                 {   
                     // *alphaFile_ << alphaSecAvg[i][j][k] << " ";
                     // *VmagFile_ << VmagSecAvg[i][j][k] << " ";
@@ -2014,9 +2016,10 @@ void horizontalAxisWindTurbinesADMUniform::printDebug()
     Info << "epsilon = " << epsilon << endl;
     Info << "projectionRadius = " << projectionRadius << endl;
     Info << "azimuth = " << azimuth << endl;
-    Info << "rotSpeed = " << rotSpeed << endl;
-    Info << "pitch = " << pitch << endl;
+    // Info << "rotSpeed = " << rotSpeed << endl;
+    // Info << "pitch = " << pitch << endl;
     Info << "nacYaw = " << nacYaw << endl << endl << endl;
+    Info << "nacTilt = " << nacTilt << endl << endl << endl;
     Info << "Ct = " << Ct << endl << endl << endl;
     Info << "XChi = " << XChi << endl << endl << endl;
     
@@ -2024,34 +2027,34 @@ void horizontalAxisWindTurbinesADMUniform::printDebug()
     Info << "turbineTypeDistinct = " << turbineTypeDistinct << endl;
     Info << "turbineTypeID = " << turbineTypeID << endl << endl << endl;;
 
-    Info << "NumBl = " << NumBl << endl;
-    Info << "TipRad = " << TipRad << endl;
-    Info << "HubRad = " << HubRad << endl;
-    Info << "UndSling = " << UndSling << endl;
-    Info << "OverHang = " << OverHang << endl;
-    Info << "TowerHt = " << TowerHt << endl;
-    Info << "Twr2Shft = " << Twr2Shft << endl;
-    Info << "ShftTilt = " << ShftTilt << endl;
-    Info << "PreCone = " << PreCone << endl;
-    Info << "GBRatio = " << GBRatio << endl;
-    Info << "GBEfficiency = " << GBEfficiency << endl;
-    Info << "GenEfficiency = " << GenEfficiency << endl;
-    Info << "HubIner = " << HubIner << endl;
-    Info << "GenIner = " << GenIner << endl;
-    Info << "BladeIner = " << BladeIner << endl;
-    Info << "GenTorqueControllerType = " << GenTorqueControllerType << endl;
-    Info << "NacYawControllerType = " << NacYawControllerType << endl;
-    Info << "AirfoilType = " << AirfoilType << endl;
-    Info << "BladeData = " << BladeData << endl;
-    Info << "BladeStation = " << BladeStation << endl;
-    Info << "BladeChord = " << BladeChord << endl;
-    Info << "BladeTwist = " << BladeTwist << endl;
-    Info << "AirfoilTypesDistinct = " << airfoilTypesDistinct << endl;
-    Info << "BladeAirfoilTypeID = " << BladeAirfoilTypeID << endl << endl << endl;
+    // Info << "NumBl = " << NumBl << endl;
+    // Info << "TipRad = " << TipRad << endl;
+    // Info << "HubRad = " << HubRad << endl;
+    // Info << "UndSling = " << UndSling << endl;
+    // Info << "OverHang = " << OverHang << endl;
+    // Info << "TowerHt = " << TowerHt << endl;
+    // Info << "Twr2Shft = " << Twr2Shft << endl;
+    // // Info << "ShftTilt = " << ShftTilt << endl;
+    // Info << "PreCone = " << PreCone << endl;
+    // Info << "GBRatio = " << GBRatio << endl;
+    // Info << "GBEfficiency = " << GBEfficiency << endl;
+    // Info << "GenEfficiency = " << GenEfficiency << endl;
+    // Info << "HubIner = " << HubIner << endl;
+    // Info << "GenIner = " << GenIner << endl;
+    // Info << "BladeIner = " << BladeIner << endl;
+    // Info << "GenTorqueControllerType = " << GenTorqueControllerType << endl;
+    // Info << "NacYawControllerType = " << NacYawControllerType << endl;
+    // Info << "AirfoilType = " << AirfoilType << endl;
+    // Info << "BladeData = " << BladeData << endl;
+    // Info << "BladeStation = " << BladeStation << endl;
+    // Info << "BladeChord = " << BladeChord << endl;
+    // Info << "BladeTwist = " << BladeTwist << endl;
+    // Info << "AirfoilTypesDistinct = " << airfoilTypesDistinct << endl;
+    // Info << "BladeAirfoilTypeID = " << BladeAirfoilTypeID << endl << endl << endl;
 
-    Info << "airfoilAlpha = " << airfoilAlpha << endl;
-    Info << "airfoilCl = " << airfoilCl << endl;
-    Info << "airfoilCd = " << airfoilCd << endl;
+    // Info << "airfoilAlpha = " << airfoilAlpha << endl;
+    // Info << "airfoilCl = " << airfoilCl << endl;
+    // Info << "airfoilCd = " << airfoilCd << endl;
 
     Info << "sphereCells = " << sphereCells << endl << endl << endl;
 
@@ -2066,7 +2069,7 @@ void horizontalAxisWindTurbinesADMUniform::printDebug()
     Info << "deltaNacYaw = " << deltaNacYaw << endl;
     Info << "deltaAzimuth = " << deltaAzimuth << endl;
 
-    Info << "bladeForce = " << bladeForce << endl;
+    // Info << "bladeForce = " << bladeForce << endl;
     Info << "bladeForceSimplified = " << bladeForceSimplified << endl;
     Info << "windVectors = " << windVectors << endl;
     Info << "bladeAlignedVectors = " << bladeAlignedVectors << endl;

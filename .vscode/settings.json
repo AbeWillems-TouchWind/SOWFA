@@ -4,6 +4,7 @@
         "horizontalAxisWindTurbinesADM.C": "cpp",
         "horizontalAxisWindTurbinesADMUniform.C": "cpp",
         "simplewindPlantSolver.C": "cpp",
-        "pisoFoamTurbine.C": "cpp"
+        "pisoFoamTurbine.C": "cpp",
+        "horizontalAxisWindTurbinesALM.C": "cpp"
     }
 }
