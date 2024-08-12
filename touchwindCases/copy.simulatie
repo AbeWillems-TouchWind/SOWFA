@@ -1,0 +1,14 @@
+#!/bin/bash
+
+foldertocopy=$1
+folderdestination=$2
+
+if [[ -d $folderdestination ]]; then
+	echo "Folderdestination already exists"
+else
+	mkdir $folderdestination && cd $foldertocopy
+	runscriptList=($(ls ./runscript.*))
+	cp -r 0.original/ constant/ system/ setUp userinput.sh ../$folderdestination
+	cp -r "${runscriptList[@]}" ../$folderdestination
+	cd ../
+fi 
