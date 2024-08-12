@@ -95,8 +95,11 @@ touchwindCases/**/VTK/
 # Ignore any .zip files inside myfolder or its subfolders
 touchwindCases/**/*.zip
 
-# Ignore any folder that consists of only digits (e.g., 0, 100, 101, 200, etc.)
+# Ignore folders that are exactly digits (e.g., 0, 100, 101, 200, etc.)
 touchwindCases/**/[0-9]*/
+
+# Exclude (do not ignore) folders that have numbers followed by other characters
+!touchwindCases/**/[0-9]*.*/
 
 # Ignore any folder that consists of only digits (e.g., 0, 100, 101, 200, etc.)
 touchwindCases/**/turbineOutput/
