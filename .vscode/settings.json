@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "simplifiedWindTurbinesADM.C": "cpp",
+        "horizontalAxisWindTurbinesADM.C": "cpp",
+        "horizontalAxisWindTurbinesADMUniform.C": "cpp"
+    }
+}
