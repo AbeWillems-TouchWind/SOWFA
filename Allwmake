@@ -161,6 +161,11 @@ cd applications/solvers/incompressible/windEnergy/pisoFoamTurbine.ADMUniform
 wmake
 cd ../../../../../
 
+# The basic non-buoyant solver with the teether in actuator disk.
+cd applications/solvers/incompressible/windEnergy/pisoFoamTurbine.ADMT
+wmake
+cd ../../../../../
+
 
 # A simple solver shell meant for testing wind turbine models.
 cd applications/solvers/incompressible/windEnergy/turbineTestHarness.ALM

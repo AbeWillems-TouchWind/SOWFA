@@ -42,7 +42,7 @@ turbine0
     //TorqueGen            0.0;
     //Pitch                0.0;
     NacYaw             	 270.0;
-	NacTilt				 -20.0;
+	NacTilt				 20.0;
     fluidDensity         1.225;
 	Ct					 2.0;
 	XChi				 0.9;

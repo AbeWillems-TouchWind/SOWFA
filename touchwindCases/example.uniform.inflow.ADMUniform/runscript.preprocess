@@ -78,6 +78,7 @@ blockMesh > log.blockMesh 2>&1
 
 
 # Run turbine setup
+echo "   -Create Turbines from TurbineArray script..."
 chmod u+rwx ./constant/CreateTurbineArray.sh
 cd constant/
 ./CreateTurbineArray.sh

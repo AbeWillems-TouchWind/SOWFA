@@ -1,0 +1,119 @@
+#!/bin/bash
+
+
+# User Input.
+echo "   -Loading userinput..."
+chmod u+rwx ./userinput.sh
+source ./userinput.sh
+
+# Specialized file userinput.
+parallel=0                      # Boolean for whether or not the preprocessing is run in parallel.
+runNumber=1
+
+
+
+# Clean previous run
+chmod u+rwx ./runscript.clean
+./runscript.clean
+
+
+
+# Define folder name based on current directory
+foldername=${PWD##*/}
+foldername+="_prerun"
+
+# Remove existing zip file if it exists
+if [[ -f ./$foldername.zip ]]; then
+  rm -rf $foldername.zip
+fi
+
+# Initialize an array to hold the files that exist
+files_to_zip=()
+
+# List of files to be zipped
+files=("0.original" "system" "constant" "runscript.complete" "runscript.preprocess" "runscript.postprocess" "runscript.solve.1" "setUp" "userinput.sh")
+
+# Check each file and add to the array if it exists
+for file in "${files[@]}"; do
+  if [[ -e $file ]]; then
+    files_to_zip+=("$file")
+  fi
+done
+
+# Zip the existing files
+if [[ ${#files_to_zip[@]} -gt 0 ]]; then
+  zip -r "$foldername.zip" "${files_to_zip[@]}" > log.zipprerun 2>&1
+else
+  echo "No files found to zip."
+fi
+
+
+
+# Source the bash profile and then call the appropriate OpenFOAM version function
+# so that all the modules and environment variables get set.
+echo "   -Sourcing the bash profile, loading modules, and setting the OpenFOAM environment variables..."
+source ~/.bashrc
+source $HOME/OpenFOAM/OpenFOAM-2.4.0/etc/bashrc
+
+
+# Copy the controlDict.1 (assuming this is the one the actual solver will start
+# out with) to controlDict.  OpenFOAM reads "controlDict", not the numbered ones.
+echo "   -Getting the control dictionary ready..."
+cp system/controlDict.$runNumber system/controlDict
+
+
+# Copy the "clean" .original initial fields to a working copy.  OpenFOAM does not
+# read the ".original" initial fields--that's why they remain clean.
+echo "   -Getting the initial conditions..."
+rm -rf $startTime
+cp -rf $startTime.original $startTime
+
+
+# Build the mesh.
+echo "   -Build the the base mesh..."
+cp constant/polyMesh/blockMeshDict ./
+rm -rf constant/polyMesh/*
+mv ./blockMeshDict constant/polyMesh
+blockMesh > log.blockMesh 2>&1
+
+
+# Run turbine setup
+echo "   -Create Turbines from TurbineArray script..."
+chmod u+rwx ./constant/CreateTurbineArray.sh
+cd constant/
+./CreateTurbineArray.sh
+cd ../
+
+# If running in parallel from this point forward, then do the following:
+if [ $parallel -eq 1 ]
+   then
+   # Decompose the mesh and solution files (serial)
+   echo "   -Using decomposePar to decompose the problem for parallel processing..."
+   decomposePar -cellDist -force > log.decomposePar 2>&1
+
+   # Check the mesh
+   echo "   -Running checkMesh to report mesh diagnostics..."
+   mpirun -np $cores checkMesh -parallel > log.checkMesh.2 2>&1
+
+   # Renumber the mesh for better matrix solver performance.
+   echo "   -Using renumberMesh to renumber the mesh for better matrix conditioning..."
+   mpirun -np $cores renumberMesh -parallel -overwrite > log.renumberMesh 2>&1
+
+   # Do one last check on the mesh.
+   mpirun -np $cores checkMesh -parallel > log.checkMesh.3 2>&1
+
+
+# Otherwise, run in serial as follows:
+else
+   # Renumber the mesh.
+   echo "   -Renumbering the mesh with renumberMesh..."
+   renumberMesh -overwrite > log.renumberMesh 2>&1
+
+   # Decompose the mesh and solution files (serial)
+   echo "   -Decomposing the domain with decomposePar..."
+   decomposePar -cellDist -force > log.decomposePar 2>&1
+
+   # Check the mesh.
+   echo "   -Checking the mesh with checkMesh..."
+   checkMesh > log.checkMesh.1 2>&1
+fi

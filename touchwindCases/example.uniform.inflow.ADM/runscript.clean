@@ -1,0 +1,76 @@
+#!/bin/bash
+
+# List of files and directories to keep (relative to the current directory)
+KEEP_LIST=(
+    "0.original"
+    "constant"
+    "system"
+    "runscript.clean"
+    "runscript.complete"
+    "runscript.postprocess"
+    "runscript.preprocess"
+    "runscript.solve.1"
+    "setUp"
+    "userinput.sh"
+)
+
+# List of specific files to remove if they exist
+REMOVE_LIST=(
+    "constant/sources"
+    "constant/boundaryData"
+)
+
+echo "Running clean (directory)..."
+
+# Check if 'setUp' exists in the current directory
+if [ ! -e "setUp" ]; then
+    echo "setUp not found in the current directory. Script may have been run from the wrong directory! Exiting script."
+    exit 1
+fi
+
+# Function to recursively delete files not in KEEP_LIST
+clean_directory() {
+    for item in "$1"/*; do
+        relative_path="${item#./}"
+
+        if [ -d "$item" ]; then
+            # If the directory is in KEEP_LIST, skip processing its contents
+            if [[ " ${KEEP_LIST[@]} " =~ " $relative_path " ]]; then
+                continue	 
+            fi
+			
+            # After processing, check if the directory itself is in the KEEP_LIST
+            if ! [[ " ${KEEP_LIST[@]} " =~ " $relative_path " ]]; then
+                echo "      - Deleting directory: $relative_path"
+                # The next line will delete the directory
+				rm -rf "$item"
+            fi
+
+        elif [ -f "$item" ]; then
+            # If it's a file, check if it's in the KEEP_LIST
+            if ! [[ " ${KEEP_LIST[@]} " =~ " $relative_path " ]]; then
+                echo "      - Deleting file: $relative_path"
+                # The next line will delete the file
+                rm "$item"
+            fi
+        fi
+    done
+}
+
+# Function to delete specific files in REMOVE_LIST
+delete_files_in_remove_list() {
+    for file in "${REMOVE_LIST[@]}"; do
+        if [ -f "$file" ]; then
+            echo "      - Deleting file in REMOVE_LIST: $file"
+            rm "$file"
+        fi
+    done
+}
+
+# Start the cleaning process from the current directory
+clean_directory "."
+
+# Remove specific files listed in REMOVE_LIST
+delete_files_in_remove_list
+
+echo "Cleanup complete."
