@@ -31,14 +31,16 @@ GBRatio                97.0;
 GenIner               534.116;
 HubIner               115.926E3;
 BladeIner             11.776047E6;
-GenTorqueControllerType "none";
-NacYawControllerType      "none";
+GenTorqueControllerType     "none";
+NacYawControllerType        "none";
 BladePitchControllerType    "none";
-RatedRotSpeed         16.0;
+TeeterControllerType		"none";
+RatedRotSpeed               16.0;
 RotSpeedLimiter             false;
 GenTorqueRateLimiter        false;
 NacYawRateLimiter           false;
 BladePitchRateLimiter       false;
+TeeterRateLimiter           false;
 SpeedFilterCornerFrequency  2.0;
 
 
@@ -69,7 +71,16 @@ BladePitchControllerParams
     RateLimitBladePitch             4.5;
 }
 
-
+TeeterControllerParams
+{
+	TeeterI							1.0;
+	TeeterCa						1.0;
+	TeeterKa						1.0;
+	TeeterKcf						1.0;
+	TeeterMin					  -10.0;
+	TeeterMax					   10.0;
+	RateLimitTeeter					2.0;
+}
 
 Airfoils
 (

@@ -30,16 +30,18 @@ GenEfficiency           0.944;
 GenIner               534.116;
 HubIner               115.926E3;
 BladeIner             11.776047E6;
-GenTorqueControllerType "fiveRegion";
-//NacYawControllerType      "yawSC";
-NacYawControllerType	  "none";
-//BladePitchControllerType    "PIDSC";
-BladePitchControllerType	"none";
-RatedRotSpeed         12.1;
+GenTorqueControllerType 		"fiveRegion";
+//NacYawControllerType        	  "yawSC";
+NacYawControllerType	  		"none";
+//BladePitchControllerType    	  "PIDSC";
+BladePitchControllerType		"none";
+TeeterControllerType			"flapequation";
+RatedRotSpeed         		12.1;
 RotSpeedLimiter             false;
 GenTorqueRateLimiter        true;
 NacYawRateLimiter           true;
 BladePitchRateLimiter       true;
+TeeterRateLimiter			false; 
 SpeedFilterCornerFrequency  2.0;
 
 
@@ -64,27 +66,26 @@ NacYawControllerParams
 
 BladePitchControllerParams
 {
-    PitchK    6.3;
-    PitchMin      0.0;
-    PitchMax    90.0;
-    PitchControlKP      1.82620057;
-    PitchControlKI              0.78265750;
-    PitchControlKD             0.0;
-    RateLimitBladePitch             8.0;
+    PitchK    				6.3;
+    PitchMin      			0.0;
+    PitchMax    		   90.0;
+    PitchControlKP      	1.82620057;
+    PitchControlKI        	0.78265750;
+    PitchControlKD         	0.0;
+    RateLimitBladePitch    	8.0;
 }
 
 
-
-//BladePitchControllerParams
-//{
-//    PitchControlStartPitch    0.0;
-//    PitchControlEndPitch      7.6;
-//    PitchControlStartSpeed    15.77;
-//    PitchControlEndSpeed      16.0;
-//    RateLimitBladePitch             4.5;
-//}
-
-
+TeeterControllerParams
+{
+	TeeterI							1.0;
+	TeeterCa						1.0;
+	TeeterKa						1.0;
+	TeeterKcf						1.0;
+	TeeterMin					  -10.0;
+	TeeterMax					   10.0;
+	RateLimitTeeter					2.0;
+}
 
 Airfoils
 (

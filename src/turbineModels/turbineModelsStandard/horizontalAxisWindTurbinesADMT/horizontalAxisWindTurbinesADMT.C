@@ -170,6 +170,7 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
         teeter.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Teeter"))));
         nacYaw.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("NacYaw"))));
         fluidDensity.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("fluidDensity")))); 
+        AzimuthMomentumSum.append(0.0);
     }
 
 
@@ -249,10 +250,12 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
         GenTorqueControllerType.append(word(turbineProperties.lookup("GenTorqueControllerType")));
         NacYawControllerType.append(word(turbineProperties.lookup("NacYawControllerType")));
         BladePitchControllerType.append(word(turbineProperties.lookup("BladePitchControllerType")));
+        TeeterControllerType.append(word(turbineProperties.lookup("TeeterControllerType")));
         RotSpeedLimiter.append(bool(readBool(turbineProperties.lookup("RotSpeedLimiter"))));
         GenTorqueRateLimiter.append(bool(readBool(turbineProperties.lookup("GenTorqueRateLimiter"))));
         NacYawRateLimiter.append(bool(readBool(turbineProperties.lookup("NacYawRateLimiter"))));
         BladePitchRateLimiter.append(bool(readBool(turbineProperties.lookup("BladePitchRateLimiter"))));
+        TeeterRateLimiter.append(bool(readBool(turbineProperties.lookup("TeeterRateLimiter"))));
         SpeedFilterCornerFrequency.append(scalar(readScalar(turbineProperties.lookup("SpeedFilterCornerFrequency"))));
 
 
@@ -289,8 +292,7 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
             speedInt.clear();
             torqueInt.clear();
         }
-        
-       
+
 
         RateLimitBladePitch.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("RateLimitBladePitch")));
         if (BladePitchControllerType[i] == "none")
@@ -305,6 +307,22 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
             PitchControlKP.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchControlKP")));
             PitchControlKI.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchControlKI")));
             PitchControlKD.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchControlKD")));
+        }
+
+
+        RateLimitTeeter.append(readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("RateLimitTeeter")));
+        if (GenTorqueControllerType[i] == "none")
+        {
+            // Read nothing
+        }
+        else if (TeeterControllerType[i] == "flapequation")
+        {
+            TeeterI.append(readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterI")));
+            TeeterCa.append(readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterCa")));
+            TeeterKa.append(readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterKa")));
+            TeeterKcf.append(readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterKcf")));
+            TeeterMin.append(readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterMin")));
+            TeeterMax.append(readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterMax")));
         }
 
 
@@ -463,6 +481,8 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
     rotSpeedF = rpmRadSec * rotSpeedF;
     nacYaw    = degRad * nacYaw;
     teeter    = degRad * teeter; 
+    TeeterMin = degRad * TeeterMin; 
+    TeeterMax = degRad * TeeterMax;
     ShftTilt  = degRad * ShftTilt;
     SpeedFilterCornerFrequency = rpsRadSec * SpeedFilterCornerFrequency;
     RatedRotSpeed = rpmRadSec * RatedRotSpeed;
@@ -774,6 +794,9 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
 
     // Compute the blade forces due to this wind at the initial time step.
     computeBladeForce();
+    
+    // Compute the teeter Moment.
+    computeTeeterMoment();
 
     // Compute the resultant body force at this initial time step.
     computeBodyForce();
@@ -1040,6 +1063,35 @@ void horizontalAxisWindTurbinesADMT::controlBladePitch()
 
         // Update the pitch array.
         pitch[i] = pitchCommanded/degRad;
+    }
+}
+
+
+void horizontalAxisWindTurbinesADMT::controlTeeter()
+{
+    // Proceed turbine by turbine.
+    forAll(teeter, i)
+    {
+
+        // Get the turbine type index.
+        int j = turbineTypeID[i];
+
+
+        // Initialize the commanded teeter variable.
+        scalar teeterCommanded = teeter[i];
+
+        // Apply a controller to update the teeter position.
+        if (TeeterControllerType[j] == "none")
+        {
+            #include "controllers/teeterControllers/none.H"
+        }
+
+        else if (TeeterControllerType[j] == "flapequation")
+        {
+            #include "controllers/teeterControllers/flapequation.H"
+        }
+
+        teeter[i] = teeterCommanded;
     }
 }
 
@@ -1423,11 +1475,54 @@ void horizontalAxisWindTurbinesADMT::computeBodyForce()
     Info << "Torque from Body Force = " << torqueBodyForceSum << tab << "Torque from Act. Disk = " << torqueSum << tab << "Ratio = " << torqueBodyForceSum/torqueSum << endl;
 }
 
-void horizontalAxisWindTurbinesADMT::computeTeeterForce()
+void horizontalAxisWindTurbinesADMT::computeTeeterMoment()
 {
-    //azimuth[i]
+    scalar current_k_azimuth_left  = 0.0;
+    scalar current_k_azimuth_right = 0.0;
+    scalar current_k_azimuth_left_value  = Foam::constant::mathematical::pi;
+    scalar current_k_azimuth_right_value = Foam::constant::mathematical::pi;
 
-    
+    forAll(polarbladePoints, i)
+    {
+        // Zero out valeus
+        AzimuthMomentumSum[i] *= 0.0;
+        
+        // Calculate opposite azimuth value
+        scalar azimuth_R = azimuth[i] + Foam::constant::mathematical::pi;
+        if (azimuth_R >= 2.0 * Foam::constant::mathematical::pi)
+        {
+            azimuth_R -= 2.0 * Foam::constant::mathematical::pi;
+        }
+
+        // Proceed blade by blade (or ring i.c.o. actuator disk).
+        forAll(polarbladePoints[i], j)
+        {
+            // Proceed point by point.
+            forAll(polarbladePoints[i][j], k)
+            {
+                // Go through all points and save the minim to the current azimuth angle
+                if (MinDifferenceAzimuthbase(azimuth[i], polarbladePoints[i][j][k][1]) < current_k_azimuth_left_value)
+                {
+                    current_k_azimuth_left = k;
+                    current_k_azimuth_left_value = MinDifferenceAzimuthbase(azimuth[i], polarbladePoints[i][j][k][1]);
+                }
+                
+                // Go through all points and save the minimum of the 180 opposite blade to the current azimuth angle
+                if (MinDifferenceAzimuthbase(azimuth_R, polarbladePoints[i][j][k][1]) < current_k_azimuth_right_value)
+                {
+                    current_k_azimuth_right = k;
+                    current_k_azimuth_right_value = MinDifferenceAzimuthbase(azimuth_R, polarbladePoints[i][j][k][1]);
+                }
+            }
+
+            // Multiply the maximum and mimumum indixes with the radius and sum amoung the azumuth line
+            AzimuthMomentumSum[i] += polarbladePoints[i][j][current_k_azimuth_left][0] * bladeForce[i][j][current_k_azimuth_left][0] - polarbladePoints[i][j][current_k_azimuth_right][0] * bladeForce[i][j][current_k_azimuth_right][0];
+
+            // reset left and right k
+            current_k_azimuth_left_value  = Foam::constant::mathematical::pi;
+            current_k_azimuth_right_value = Foam::constant::mathematical::pi;
+        }
+    }
 }
 
 
@@ -1488,6 +1583,10 @@ vector horizontalAxisWindTurbinesADMT::XYZtoPolar(vector point, vector centerPoi
 
      // Compute the azimuthal angle theta
     double theta = Foam::atan2(vPlane & perp2axis, vPlane & perpaxis);
+    if (theta < 0)
+    {
+        theta += 2 * Foam::constant::mathematical::pi;
+    }
 
     // Compute the polar angle phi (angle between v and the axis)
     double phi = Foam::asin((v & axis) / r);
@@ -1659,7 +1758,14 @@ scalar horizontalAxisWindTurbinesADMT::standardToCompass(scalar dir)
     }
     return dir;
 }
-    
+
+scalar horizontalAxisWindTurbinesADMT::MinDifferenceAzimuthbase(scalar base, scalar target)
+{
+    scalar diff = Foam::mag(target - base);                                 // Direct difference
+    scalar wrap_diff = 2 * Foam::constant::mathematical::pi - diff;         // Indirect difference 
+    return diff < wrap_diff ? diff : wrap_diff;                             // return lowest
+}
+
 void horizontalAxisWindTurbinesADMT::update()
 {
     // Update the time step size.
@@ -1681,6 +1787,7 @@ void horizontalAxisWindTurbinesADMT::update()
         filterRotSpeed();
         controlGenTorque();
         controlBladePitch();
+        controlTeeter();
         controlNacYaw();
         computeRotSpeed();
         rotateBlades();
@@ -1692,6 +1799,7 @@ void horizontalAxisWindTurbinesADMT::update()
         filterRotSpeed();
         controlGenTorque();
         controlBladePitch();
+        controlTeeter();
         controlNacYaw();
         computeRotSpeed();
         rotateBlades();
@@ -1706,6 +1814,9 @@ void horizontalAxisWindTurbinesADMT::update()
 
     // Compute the blade forces.
     computeBladeForce();
+
+    // Compute the teeter Moment.
+    computeTeeterMoment();
 
     // Project the blade forces as body forces.
     computeBodyForce();

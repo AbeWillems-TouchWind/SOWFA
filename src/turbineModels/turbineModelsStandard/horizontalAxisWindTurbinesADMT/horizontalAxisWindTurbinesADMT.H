@@ -240,7 +240,7 @@ private:
             //- Initial blade pitch (degrees) of all blades.
             DynamicList<scalar> pitch;
 
-            //- Initial turbine teeter (degrees) of all blades.
+            //- Initial turbine teeter (degrees) of the turbine.
             DynamicList<scalar> teeter;
 
             //- Initial or fixed nacelle yaw angle.  Direction that the turbine
@@ -341,6 +341,10 @@ private:
 	    //  specified pitch).
 	    DynamicList<word> BladePitchControllerType;
 
+        //- Teeter controller type (NOT IMPLEMENTED, just remains at 
+	    //  specified teeter).
+	    DynamicList<word> TeeterControllerType;
+
             //- Engage a rotor speed limiter (do not let rotor speed exceed rated
             //  or become negative.
             DynamicList<bool> RotSpeedLimiter;
@@ -353,6 +357,9 @@ private:
 
             //- Engage a blade pitch rate limiter.
             DynamicList<bool> BladePitchRateLimiter;
+
+            //- Engage a teeter rate limiter.
+            DynamicList<bool> TeeterRateLimiter;
 
             //- Parameter for low-pass speed filter for control system (Hz).
             DynamicList<scalar> SpeedFilterCornerFrequency;
@@ -406,12 +413,34 @@ private:
                 DynamicList<scalar> PitchControlKP; // (s)
                 DynamicList<scalar> PitchControlKI; // (unitless)
                 DynamicList<scalar> PitchControlKD; // (s^2)
-     
-       
-            //- Nacelle yaw control parameters
-                //- Maximum rate of change of nacelle yaw (degrees/s).
-                DynamicList<scalar> RateLimitNacYaw;
 
+
+            //- Teeter control parameters. 
+                //- Moment of inertia (kg / m^2). 
+                DynamicList<scalar> TeeterI;
+
+                //- Aerodynamic damping (Nms/rad). 
+                DynamicList<scalar> TeeterCa;
+
+                //- Aerodynamic stiffness (Nm/rad).
+                DynamicList<scalar> TeeterKa;
+
+                //- Centrifugal stiffness (Nm/rad).
+                DynamicList<scalar> TeeterKcf;
+
+                //- Minimum Teeter (degrees). 
+                DynamicList<scalar> TeeterMin;
+
+                //- Maximum Teeter (degrees). 
+                DynamicList<scalar> TeeterMax;
+
+                //- Maximum rate of change of teeter (degree/s).
+                DynamicList<scalar> RateLimitTeeter;
+
+
+            //- Nacelle yaw control parameters
+                //- Moment of intertia rate of change of nacelle yaw (degrees/s).
+                DynamicList<scalar> RateLimitNacYaw;
 
 
             //- List of airfoils that compose turbine blade;
@@ -535,6 +564,9 @@ private:
 
             //- Blade force at each actuator point.
             DynamicList<List<List<vector> > > bladeForce;
+
+            //- Teeter Moment of the turbine
+            DynamicList<scalar> AzimuthMomentumSum;
 
             //- Three vectors for each blade of each turbine that define the local
             //  blade-aligned coordinate system.  Vector 0 is along the blade pointed
@@ -705,6 +737,9 @@ private:
         //- Calculate the blade pitch.
         void controlBladePitch();
 
+        //- Calculate the teeter angle. 
+        void controlTeeter();
+
         //- Find out which processor zone each actuator line point lies within.
         //  (Which processor is controlling each actuator line point?)
         void findControlProcNo();
@@ -720,8 +755,8 @@ private:
         //- Compute body forces.
         void computeBodyForce();
 
-        //- Compute teeter forces on azimuth angle line.
-        void computeTeeterForce();
+        //- Compute teeter moment on azimuth angle line.
+        void computeTeeterMoment();
 
         //- Compute azimuthal sector averages of blade quantities.
         void computeSectorAverage();
@@ -743,6 +778,8 @@ private:
 
         //- Change a degree angle measurement from standard to compass.
         scalar standardToCompass(scalar dir);
+
+        scalar MinDifferenceAzimuthbase(scalar base, scalar target);
 
         //- Open turbine data output files.
         void openOutputFiles();
