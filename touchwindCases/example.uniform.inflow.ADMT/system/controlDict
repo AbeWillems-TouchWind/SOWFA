@@ -26,12 +26,13 @@ FoamFile
 
   stopAt            endTime;
 
-  endTime           200.0;
+  endTime           4.0;
 
-startTimeMean      100;
-startTimeCorr      200;
+  startTimeMean     100;
+  
+  startTimeCorr     200;
 
-  deltaT            0.2;
+  deltaT            0.001;
 
   writeControl      adjustableRunTime;
 

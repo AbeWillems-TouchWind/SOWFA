@@ -242,6 +242,8 @@ private:
 
             //- Initial turbine teeter (degrees) of the turbine.
             DynamicList<scalar> teeter;
+            DynamicList<scalar> teeterdot;
+            DynamicList<scalar> teeterddot;
 
             //- Initial or fixed nacelle yaw angle.  Direction that the turbine
             //  is pointed in cardinal directions (i.e. 0 = north, 90 = east, 
@@ -433,6 +435,10 @@ private:
 
                 //- Maximum Teeter (degrees). 
                 DynamicList<scalar> TeeterMax;
+
+                
+
+                
 
                 //- Maximum rate of change of teeter (degree/s).
                 DynamicList<scalar> RateLimitTeeter;

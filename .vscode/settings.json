@@ -6,6 +6,10 @@
         "simplewindPlantSolver.C": "cpp",
         "pisoFoamTurbine.C": "cpp",
         "horizontalAxisWindTurbinesALM.C": "cpp",
-        "horizontalAxisWindTurbinesADMT.C": "cpp"
+        "horizontalAxisWindTurbinesADMT.C": "cpp",
+        "dynLagrangianCs.C": "cpp",
+        "horizontalAxisWindTurbinesALMOpenFAST.C": "cpp",
+        "flapequation.C": "cpp",
+        "windPlantSolver.C": "cpp"
     }
 }

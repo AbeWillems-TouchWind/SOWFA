@@ -167,7 +167,9 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
         azimuth.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Azimuth"))));
         torqueGen.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("TorqueGen"))));
         pitch.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Pitch"))));
-        teeter.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Teeter"))));
+        teeter.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Teeter"))));                
+        teeterdot.append(0.0);
+        teeterddot.append(0.0);
         nacYaw.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("NacYaw"))));
         fluidDensity.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("fluidDensity")))); 
         AzimuthMomentumSum.append(0.0);
@@ -1078,7 +1080,7 @@ void horizontalAxisWindTurbinesADMT::controlTeeter()
 
 
         // Initialize the commanded teeter variable.
-        scalar teeterCommanded = teeter[i];
+        //scalar teeterCommanded = teeter[i];
 
         // Apply a controller to update the teeter position.
         if (TeeterControllerType[j] == "none")
@@ -1091,7 +1093,7 @@ void horizontalAxisWindTurbinesADMT::controlTeeter()
             #include "controllers/teeterControllers/flapequation.H"
         }
 
-        teeter[i] = teeterCommanded;
+        //teeter[i] = teeterCommanded;
     }
 }
 

@@ -13,9 +13,9 @@ zMin                 0.0;                         // Minimum z-extent of domain 
 xMax                 1005.0;                      // Maximum x-extent of domain (m).
 yMax                 1005.0;                       // Maximum y-extent of domain (m).
 zMax                 1000.0;                      // Maximum z-extent of domain (m).
-nx                   67;                         // Number of cells in x-direction.
-ny                   67;                          // Number of cells in y-direction.
-nz                   71;                          // Number of cells in z-direction.
+nx                   20; //67;                         // Number of cells in x-direction.
+ny                   20; //67;                          // Number of cells in y-direction.
+nz                   20; //71;                          // Number of cells in z-direction.
 
 
 

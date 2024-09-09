@@ -38,9 +38,9 @@ BladePitchControllerType		"none";
 TeeterControllerType			"flapequation";
 RatedRotSpeed         		12.1;
 RotSpeedLimiter             false;
-GenTorqueRateLimiter        true;
-NacYawRateLimiter           true;
-BladePitchRateLimiter       true;
+GenTorqueRateLimiter        false;
+NacYawRateLimiter           false;
+BladePitchRateLimiter       false;
 TeeterRateLimiter			false; 
 SpeedFilterCornerFrequency  2.0;
 
@@ -78,10 +78,11 @@ BladePitchControllerParams
 
 TeeterControllerParams
 {
-	TeeterI							1.0;
-	TeeterCa						1.0;
-	TeeterKa						1.0;
-	TeeterKcf						1.0;
+	TeeterI							2.4E7;
+	TeeterCa						1.07E8;
+	//TeeterCa						0.0;
+	TeeterKa						3.09E8;
+	TeeterKcf						4.95E7;
 	TeeterMin					  -10.0;
 	TeeterMax					   10.0;
 	RateLimitTeeter					2.0;
