@@ -60,6 +60,9 @@ SourceFiles
 #include "OFstream.H"
 #include "fvCFD.H"
 #include "Random.H"
+#include "flapODE.H"
+#include <memory>
+#include <vector>    
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -240,10 +243,14 @@ private:
             //- Initial blade pitch (degrees) of all blades.
             DynamicList<scalar> pitch;
 
-            //- Initial turbine teeter (degrees) of the turbine.
-            DynamicList<scalar> teeter;
-            DynamicList<scalar> teeterdot;
-            DynamicList<scalar> teeterddot;
+            //- list of 1D arrays of teeter variables, with 0 being the (initial) 
+            // turbine teeter (degrees) of the turbine and 1 being the derivative
+            // of the turbine teeter angle. 
+            DynamicList<scalarField> teeter;
+
+            //- list of 1D arrays of teeter variables described in equation of 
+            // motion state. 
+            DynamicList<scalarField> dteeter; 
 
             //- Initial or fixed nacelle yaw angle.  Direction that the turbine
             //  is pointed in cardinal directions (i.e. 0 = north, 90 = east, 
@@ -436,9 +443,21 @@ private:
                 //- Maximum Teeter (degrees). 
                 DynamicList<scalar> TeeterMax;
 
-                
+                //- Selected Solver type.
+                DynamicList<dictionary> TeeterSolverDicts;
 
+                //- integration initial step (stepsize within ODE)
+                DynamicList<scalar> TeeterODEdtEst;
                 
+                //- Dynamic list to hold flapODE instances, it differs per
+                // distinct turbine, since Initialized variables for each 
+                // turbine may differ.  
+                DynamicList<flapODE> flapODEs;
+
+                //- Dynamic list to hold odeSolver informations, since each
+                // distinct turbine does have a different ode, they may 
+                // require different solver settings. 
+                DynamicList<autoPtr<ODESolver> > ODESolvers;
 
                 //- Maximum rate of change of teeter (degree/s).
                 DynamicList<scalar> RateLimitTeeter;

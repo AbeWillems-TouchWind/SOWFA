@@ -167,9 +167,10 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
         azimuth.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Azimuth"))));
         torqueGen.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("TorqueGen"))));
         pitch.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Pitch"))));
-        teeter.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Teeter"))));                
-        teeterdot.append(0.0);
-        teeterddot.append(0.0);
+        teeter.append(scalarField(2)); 
+        teeter[i][0] = readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Teeter"));
+        dteeter.append(scalarField(2));
+        TeeterODEdtEst.append(0.1);
         nacYaw.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("NacYaw"))));
         fluidDensity.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("fluidDensity")))); 
         AzimuthMomentumSum.append(0.0);
@@ -325,8 +326,30 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
             TeeterKcf.append(readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterKcf")));
             TeeterMin.append(readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterMin")));
             TeeterMax.append(readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterMax")));
-        }
+            
+            
+            flapODE ODE(TeeterI[i], TeeterCa[i], TeeterKa[i], TeeterKcf[i]);
+            flapODEs.append(ODE);
 
+            dictionary SolverDict;
+            SolverDict.add("solver", word(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterSolver")));
+            SolverDict.add("relTol", readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterSolverRelTol")));
+            TeeterSolverDicts.append(SolverDict);
+
+            autoPtr<ODESolver> newSolver = ODESolver::New(ODE, SolverDict);
+            
+            
+            if (newSolver.ptr())
+            {
+                ODESolvers.append(newSolver);
+            }
+            else
+            {
+                std::cerr << "Failed to create ODESolver." << std::endl;
+            }
+                    
+
+        }
 
 
         RateLimitNacYaw.append(readScalar(turbineProperties.subDict("NacYawControllerParams").lookup("RateLimitNacYaw")));
@@ -1777,6 +1800,9 @@ void horizontalAxisWindTurbinesADMT::update()
     time = runTime_.timeName();
     t = runTime_.value();
 
+
+     Info << "before update" << endl;
+
     if(bladeUpdateType[0] == "oldPosition")
     {
         // Find out which processor controls which actuator point,
@@ -1789,7 +1815,9 @@ void horizontalAxisWindTurbinesADMT::update()
         filterRotSpeed();
         controlGenTorque();
         controlBladePitch();
+        Info << "before teeter" << endl;
         controlTeeter();
+        Info << "after teeter" << endl;
         controlNacYaw();
         computeRotSpeed();
         rotateBlades();
@@ -1813,6 +1841,7 @@ void horizontalAxisWindTurbinesADMT::update()
       //findControlProcNo();
         computeWindVectors();
     }
+    Info << "after update" << endl;
 
     // Compute the blade forces.
     computeBladeForce();

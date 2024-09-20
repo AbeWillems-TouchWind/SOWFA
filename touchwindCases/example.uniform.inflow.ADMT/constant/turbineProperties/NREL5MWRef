@@ -86,6 +86,8 @@ TeeterControllerParams
 	TeeterMin					  -10.0;
 	TeeterMax					   10.0;
 	RateLimitTeeter					2.0;
+	TeeterSolver					"seulex";
+	TeeterSolverRelTol				1E-5;
 }
 
 Airfoils

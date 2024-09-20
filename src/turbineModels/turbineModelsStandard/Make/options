@@ -5,7 +5,9 @@ EXE_INC = \
     -I$(LIB_SRC)/turbulenceModels \
     -I$(LIB_SRC)/turbulenceModels/LES/LESdeltas/lnInclude \
     -I$(LIB_SRC)/turbulenceModels/LES/LESfilters/lnInclude \
-    -I$(LIB_SRC)/transportModels
+    -I$(LIB_SRC)/transportModels \
+    -I$(LIB_SRC)/ODE/lnInclude
+
 
 LIB_LIBS = \
     -ltriSurface \
@@ -13,5 +15,6 @@ LIB_LIBS = \
     -lmeshTools \
     -lincompressibleTurbulenceModel \
     -lLESdeltas \
-    -lLESfilters
+    -lLESfilters \
+    -lODE
     

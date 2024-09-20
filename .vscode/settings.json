@@ -10,6 +10,7 @@
         "dynLagrangianCs.C": "cpp",
         "horizontalAxisWindTurbinesALMOpenFAST.C": "cpp",
         "flapequation.C": "cpp",
-        "windPlantSolver.C": "cpp"
+        "windPlantSolver.C": "cpp",
+        "flapODE.C": "cpp"
     }
 }

@@ -1,9 +1,26 @@
-scalar M = 2E6 * Foam::sin(5.2 * t);
+//Info << "time = " << t << endl;
+//Info << "teeter = " << teeter[i][0] << endl;
+//Info << "teeter = " << teeter[i][1] << endl;
+//Info << "dteeter = " << dteeter[i][0] << endl;
+//Info << "dteeter = " << dteeter[i][1] << endl;
 
-// Solve the ODE (flapequation): I * Bddot + Ca * Bdot + (ka + kct) * B = M
-teeterddot[i] = (M - TeeterCa[j] * teeterdot[i] - (TeeterKa[j] + TeeterKcf[j]) * teeter[i]) / TeeterI[j];
 
+flapODEs[j].derivatives(t, teeter[i], dteeter[i]);
+//Info << "dt = " << dt << endl;
+//Info << "TeeterODEdtEst = " << TeeterODEdtEst[i] << endl;
 
-// Update Bdot and B using simple time-stepping (the backward Euler method)
-teeterdot[i] = teeterdot[i] + teeterddot[i] * dt;
-teeter[i] = teeter[i] + teeterdot[i] * dt;
+//ODESolvers[j]->solve(t, t + dt, teeter[i], TeeterODEdtEst[i]);
+
+if (!ODESolvers.empty())
+{
+    std::cerr << "Error: ODESolvers[0] is not empty." << std::endl;
+}
+
+if (ODESolvers[0].ptr())
+{
+    ODESolvers[0]->solve(t, t + dt, teeter[i], TeeterODEdtEst[i]);
+}
+else
+{
+    std::cerr << "Error: ODESolvers[0] is null or empty." << std::endl;
+}

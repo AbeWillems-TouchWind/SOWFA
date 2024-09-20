@@ -26,6 +26,10 @@ cp system/controlDict.$runNumber system/controlDict
 
 
 # Run the solver.
-mpirun -np $cores $solver -parallel > log.$runNumber.$solver 2>&1
+if [ $cores -gt 1 ]; then
+    mpirun -np "$cores" "$solver" -parallel > "log.$runNumber.$solver" 2>&1
+else
+    mpirun -np 1 "$solver" > "log.$runNumber.$solver" 2>&1
+fi
 
 echo "Ending OpenFOAM job at: " $(date)
