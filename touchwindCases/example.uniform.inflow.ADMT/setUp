@@ -21,9 +21,9 @@ nz                   20; //71;                          // Number of cells in z-
 
 
 // Number of cores and domain decomposition information.
-nCores               1;                          // Number of cores on which to run this case.
+nCores               16;                          // Number of cores on which to run this case.
 decompType           simple;                      // Decomposition algorithm.  "simple" and "scotch" are good choices.
-decompOrder          (1 1 1);                     // Order of the decomposition number of partitions in (x y z)-directions.
+decompOrder          (4 2 2);                     // Order of the decomposition number of partitions in (x y z)-directions.
 
 
 

@@ -166,11 +166,12 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
         intSpeedError.append(0.0);
         azimuth.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Azimuth"))));
         torqueGen.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("TorqueGen"))));
-        pitch.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Pitch"))));
+        ipitch.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Pitch"))));
         teeter.append(scalarField(2)); 
         teeter[i][0] = readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Teeter"));
         dteeter.append(scalarField(2));
         TeeterODEdtEst.append(0.1);
+        TeeterOffset.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("TeeterOffset"))));
         nacYaw.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("NacYaw"))));
         fluidDensity.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("fluidDensity")))); 
         AzimuthMomentumSum.append(0.0);
@@ -258,7 +259,6 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
         GenTorqueRateLimiter.append(bool(readBool(turbineProperties.lookup("GenTorqueRateLimiter"))));
         NacYawRateLimiter.append(bool(readBool(turbineProperties.lookup("NacYawRateLimiter"))));
         BladePitchRateLimiter.append(bool(readBool(turbineProperties.lookup("BladePitchRateLimiter"))));
-        TeeterRateLimiter.append(bool(readBool(turbineProperties.lookup("TeeterRateLimiter"))));
         SpeedFilterCornerFrequency.append(scalar(readScalar(turbineProperties.lookup("SpeedFilterCornerFrequency"))));
 
 
@@ -311,9 +311,13 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
             PitchControlKI.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchControlKI")));
             PitchControlKD.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchControlKD")));
         }
+        else if (BladePitchControllerType[i] == "teeter")
+        {
+            PitchMin.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchMin")));
+            PitchMax.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchMax")));
+        }
 
 
-        RateLimitTeeter.append(readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("RateLimitTeeter")));
         if (GenTorqueControllerType[i] == "none")
         {
             // Read nothing
@@ -326,29 +330,13 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
             TeeterKcf.append(readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterKcf")));
             TeeterMin.append(readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterMin")));
             TeeterMax.append(readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterMax")));
-            
-            
-            flapODE ODE(TeeterI[i], TeeterCa[i], TeeterKa[i], TeeterKcf[i]);
-            flapODEs.append(ODE);
-
-            dictionary SolverDict;
+            delta3.append(readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("delta3")));
+            flapODEs.append(flapODE(TeeterI[i], TeeterCa[i], TeeterKa[i], TeeterKcf[i]));
             SolverDict.add("solver", word(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterSolver")));
             SolverDict.add("relTol", readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterSolverRelTol")));
-            TeeterSolverDicts.append(SolverDict);
-
-            autoPtr<ODESolver> newSolver = ODESolver::New(ODE, SolverDict);
-            
-            
-            if (newSolver.ptr())
-            {
-                ODESolvers.append(newSolver);
-            }
-            else
-            {
-                std::cerr << "Failed to create ODESolver." << std::endl;
-            }
-                    
-
+            SolverDicts.append(SolverDict);
+            autoPtr<ODESolver> odesolver = ODESolver::New(flapODEs[i], SolverDicts[i]);
+            ODESolvers.append(odesolver);
         }
 
 
@@ -506,14 +494,27 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
     rotSpeedF = rpmRadSec * rotSpeedF;
     nacYaw    = degRad * nacYaw;
     teeter    = degRad * teeter; 
-    TeeterMin = degRad * TeeterMin; 
-    TeeterMax = degRad * TeeterMax;
+    ipitch    = degRad * ipitch;
+    delta3    = degRad * delta3;
     ShftTilt  = degRad * ShftTilt;
     SpeedFilterCornerFrequency = rpsRadSec * SpeedFilterCornerFrequency;
     RatedRotSpeed = rpmRadSec * RatedRotSpeed;
     PitchK = degRad * PitchK;
     PitchMin = degRad * PitchMin;
     PitchMax = degRad * PitchMax;
+    TeeterMin = degRad * TeeterMin; 
+    TeeterMax = degRad * TeeterMax;
+    forAll(TeeterOffset,i)
+    {
+        if (rotationDir[i] == "cw")
+        {
+            TeeterOffset[i] = degRad * TeeterOffset[i];
+        }
+        if (rotationDir[i] == "ccw")
+        {
+            TeeterOffset[i] = degRad * -TeeterOffset[i];
+        }
+    }
     forAll(PreCone,i)
     {
         PreCone[i] = degRad * PreCone[i];
@@ -675,6 +676,7 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
         bladeForce.append(List<List<vector> >(nRadial[i]));
         bladeAlignedVectors.append(List<List<List<vector > > >(nRadial[i]));
         windVectors.append(List<List<vector> >(nRadial[i]));
+        pitch.append(List<List<scalar> >(nRadial[i]));
         alpha.append(List<List<scalar> >(nRadial[i]));
         Vmag.append(List<List<scalar> >(nRadial[i]));
         Cl.append(List<List<scalar> >(nRadial[i]));
@@ -704,6 +706,7 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
                 bladeAlignedVectors[i][m][n].append(List<vector>(3,vector::zero));
             }
             windVectors[i][m].append(List<vector>(nAzimuth[i][m],vector::zero));
+            pitch[i][m].append(List<scalar>(nAzimuth[i][m],ipitch[i]));
             alpha[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
             Vmag[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
             Cl[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
@@ -1010,7 +1013,7 @@ void horizontalAxisWindTurbinesADMT::controlGenTorque()
             #include "limiters/genTorqueRateLimiter.H"
         }
 
-        // Update the pitch array.
+        // Update the torqueGen array.
         torqueGen[i] = torqueGenCommanded;
     }
 }
@@ -1060,34 +1063,46 @@ void horizontalAxisWindTurbinesADMT::controlBladePitch()
     {
 
         // Get the turbine type index.
-        int j = turbineTypeID[i];
+        int m = turbineTypeID[i];
         
         // Initialize the gain scheduling variable.
         scalar GK = 0.0;
 
-        // Initialize the commanded pitch variable.
-        scalar pitchCommanded = pitch[i]*degRad;
 
-
-        // Apply a controller to update the blade pitch position.
-        if (BladePitchControllerType[j] == "none")
+        // Proceed blade by blade.
+        forAll(pitch[i], j)
         {
-            #include "controllers/bladePitchControllers/none.H"
-        }
+            forAll(pitch[i][j], k)
+            {
+                // Initialize the commanded pitch variable.
+                scalar pitchCommanded = pitch[i][j][k];
 
-        else if (BladePitchControllerType[j] == "PID")
-        {
-            #include "controllers/bladePitchControllers/PID.H"
-        }
+                // Apply a controller to update the blade pitch position.
+                if (BladePitchControllerType[m] == "none")
+                {
+                    #include "controllers/bladePitchControllers/none.H"
+                }
 
-        // Apply pitch rate limiter.
-        if (BladePitchRateLimiter[j])
-        {
-            #include "limiters/bladePitchRateLimiter.H"
-        }
+                else if (BladePitchControllerType[m] == "PID")
+                {
+                    #include "controllers/bladePitchControllers/PID.H"
+                }
 
-        // Update the pitch array.
-        pitch[i] = pitchCommanded/degRad;
+                else if (BladePitchControllerType[m] == "teeter")
+                {
+                    #include "controllers/bladePitchControllers/teeter.H"
+                }
+
+                // Apply pitch rate limiter.
+                if (BladePitchRateLimiter[m])
+                {
+                    #include "limiters/bladePitchRateLimiter.H"
+                }
+
+                // Update the pitch array.
+                pitch[i][j][k] = pitchCommanded;
+            }
+        }
     }
 }
 
@@ -1103,7 +1118,7 @@ void horizontalAxisWindTurbinesADMT::controlTeeter()
 
 
         // Initialize the commanded teeter variable.
-        //scalar teeterCommanded = teeter[i];
+        scalar teeterCommanded = teeter[i][0];
 
         // Apply a controller to update the teeter position.
         if (TeeterControllerType[j] == "none")
@@ -1116,7 +1131,7 @@ void horizontalAxisWindTurbinesADMT::controlTeeter()
             #include "controllers/teeterControllers/flapequation.H"
         }
 
-        //teeter[i] = teeterCommanded;
+        teeter[i][0] = teeterCommanded;
     }
 }
 
@@ -1373,7 +1388,7 @@ void horizontalAxisWindTurbinesADMT::computeBladeForce()
                 scalar windAng = Foam::atan2(windVectors[i][j][k].x(),windVectors[i][j][k].y())/degRad; 
 
                 // Angle of attack is local angle of wind with respect to rotor plane tangent minus local twist.
-                alpha[i][j][k] = windAng - twistAng - pitch[i];
+                alpha[i][j][k] = windAng - twistAng - pitch[i][j][k];
 
                 // Use airfoil look-up tables to get coefficient of lift and drag.
                 Cl[i][j][k] = interpolate(alpha[i][j][k], airfoilAlpha[airfoil], airfoilCl[airfoil]);
@@ -1801,8 +1816,6 @@ void horizontalAxisWindTurbinesADMT::update()
     t = runTime_.value();
 
 
-     Info << "before update" << endl;
-
     if(bladeUpdateType[0] == "oldPosition")
     {
         // Find out which processor controls which actuator point,
@@ -1815,9 +1828,7 @@ void horizontalAxisWindTurbinesADMT::update()
         filterRotSpeed();
         controlGenTorque();
         controlBladePitch();
-        Info << "before teeter" << endl;
         controlTeeter();
-        Info << "after teeter" << endl;
         controlNacYaw();
         computeRotSpeed();
         rotateBlades();
@@ -1841,7 +1852,6 @@ void horizontalAxisWindTurbinesADMT::update()
       //findControlProcNo();
         computeWindVectors();
     }
-    Info << "after update" << endl;
 
     // Compute the blade forces.
     computeBladeForce();
@@ -2005,8 +2015,8 @@ void horizontalAxisWindTurbinesADMT::openOutputFiles()
         *tangentialForceFile_ << "#Turbine    Sector    Time(s)    dt(s)    tangential force (N)" << endl;
 
         // Create a turbine grid coordinate file in turbine polar coordinates. 
-        bladePoints_ = new OFstream(rootDir/time/"bladePointsPC");
-        *bladePoints_ << "#Turbine    Time(s)    dt(s)    polar coordinates [R(m) Azimuth(degrees) Phi(degrees)]" << endl;
+        bladePointsFile_ = new OFstream(rootDir/time/"bladePointsPC");
+        *bladePointsFile_ << "#Turbine    Time(s)    dt(s)    polar coordinates [R(m) Azimuth(degrees) Phi(degrees)]" << endl;
     }
 }
 
@@ -2026,7 +2036,6 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
             *rotSpeedFile_ << i << " " << time << " " << dt << " ";
             *rotSpeedFFile_ << i << " " << time << " " << dt << " ";
             *azimuthFile_ << i << " " << time << " " << dt << " ";
-            *pitchFile_ << i << " " << time << " " << dt << " ";
             *teeterFile_ << i << " " << time << " " << dt << " ";
             *nacYawFile_ << i << " " << time << " " << dt << " ";
 
@@ -2039,8 +2048,7 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
             *rotSpeedFile_ << rotSpeed[i]/rpmRadSec << endl;
             *rotSpeedFFile_ << rotSpeedF[i]/rpmRadSec << endl;
             *azimuthFile_ << azimuth[i]/degRad << endl;
-            *pitchFile_ << pitch[i] << endl;
-            *teeterFile_ << teeter[i]/degRad << endl;
+            *teeterFile_ << teeter[i][0]/degRad << endl;
             *nacYawFile_ << standardToCompass(nacYaw[i]/degRad) << endl;
 
             // Proceed sector by sector.
@@ -2090,7 +2098,8 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
             }
 
             // Write out time and delta t.
-            *bladePoints_ << i << " " << time << " " << dt << " ";
+            *bladePointsFile_ << i << " " << time << " " << dt << " ";
+            *pitchFile_ << i << " " << time << " " << dt << " ";
             
             // Proceed blade by blade. 
             forAll(bladePoints[i], j)
@@ -2099,11 +2108,13 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
                 forAll(bladePoints[i][j], k)
                 {
                     // Write out values
-                    *bladePoints_   << "(" << polarbladePoints[i][j][k][0] << " " << (polarbladePoints[i][j][k][1] / degRad) << " " << (polarbladePoints[i][j][k][2] / degRad) << ") ";
+                    *bladePointsFile_   << "(" << polarbladePoints[i][j][k][0] << " " << (polarbladePoints[i][j][k][1] / degRad) << " " << (polarbladePoints[i][j][k][2] / degRad) << ") ";
+                    *pitchFile_ << pitch[i][j][k]/degRad << " ";
                 }
             }
             // End lines
-            *bladePoints_ << endl;
+            *bladePointsFile_ << endl;
+            *pitchFile_ << endl;
         }
         
         // End lines
@@ -2115,7 +2126,6 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
         *rotSpeedFile_ << endl;
         *rotSpeedFFile_ << endl;
         *azimuthFile_ << endl;
-        *pitchFile_ << endl;
         *teeterFile_ << endl;
         *nacYawFile_ << endl;
 
@@ -2131,7 +2141,8 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
         *axialForceFile_ << endl;
         *tangentialForceFile_ << endl;
 
-        *bladePoints_ << endl;
+        *bladePointsFile_ << endl;
+        *pitchFile_ << endl;
     }
 }
 
@@ -2149,6 +2160,7 @@ void horizontalAxisWindTurbinesADMT::printDebug()
     Info << "rotSpeed = " << rotSpeed << endl;
     Info << "pitch = " << pitch << endl;
     Info << "teeter = " << teeter << endl;
+    Info << "delta3 = " << delta3 << endl;
     Info << "nacYaw = " << nacYaw << endl << endl << endl;
     
     Info << "numTurbinesDistinct = " << numTurbinesDistinct << endl;

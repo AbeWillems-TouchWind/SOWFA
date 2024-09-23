@@ -62,6 +62,7 @@ turbine$ind
     TorqueGen            0.0;
     Pitch                0.0;
 	Teeter			     1.0;
+	TeeterOffset		 0.0;
     NacYaw             	 $Yaw;
     fluidDensity         1.225;
 }" >> turbineArrayProperties

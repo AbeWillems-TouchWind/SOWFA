@@ -42,6 +42,7 @@ turbine0
     TorqueGen            0.0;
     Pitch                0.0;
 	Teeter			     1.0;
+	TeeterOffset		 0.0;
     NacYaw             	 270.0;
     fluidDensity         1.225;
 }

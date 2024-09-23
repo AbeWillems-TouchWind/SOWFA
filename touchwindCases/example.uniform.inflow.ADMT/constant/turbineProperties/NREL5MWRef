@@ -31,17 +31,14 @@ GenIner               534.116;
 HubIner               115.926E3;
 BladeIner             11.776047E6;
 GenTorqueControllerType 		"fiveRegion";
-//NacYawControllerType        	  "yawSC";
 NacYawControllerType	  		"none";
-//BladePitchControllerType    	  "PIDSC";
-BladePitchControllerType		"none";
+BladePitchControllerType		"teeter";
 TeeterControllerType			"flapequation";
 RatedRotSpeed         		12.1;
 RotSpeedLimiter             false;
 GenTorqueRateLimiter        false;
 NacYawRateLimiter           false;
 BladePitchRateLimiter       false;
-TeeterRateLimiter			false; 
 SpeedFilterCornerFrequency  2.0;
 
 
@@ -85,7 +82,8 @@ TeeterControllerParams
 	TeeterKcf						4.95E7;
 	TeeterMin					  -10.0;
 	TeeterMax					   10.0;
-	RateLimitTeeter					2.0;
+	TeeterOffset					0.0; 
+	delta3							5.0; 
 	TeeterSolver					"seulex";
 	TeeterSolverRelTol				1E-5;
 }

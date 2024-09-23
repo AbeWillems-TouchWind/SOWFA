@@ -93,4 +93,21 @@ public:
     {
         M_ = Moment_current;
     }
+
+    void PrintVariables(scalar P = 0)
+    {
+        if (P != 0)
+        {
+            Info << "FlapODE Moment = " << M_ << endl;
+        }
+        else
+        {
+            Info << "FlapODE Inertia = " << I_ << endl;
+            Info << "FlapODE Dampening = " << Ca_ << endl;
+            Info << "FlapODE Stiffness Aero = " << ka_ << endl;
+            Info << "FlapODE Stiffness Centrifugal = " << kcf_ << endl;
+            Info << "FlapODE Moment = " << M_ << endl;
+        }
+    
+    }
 };

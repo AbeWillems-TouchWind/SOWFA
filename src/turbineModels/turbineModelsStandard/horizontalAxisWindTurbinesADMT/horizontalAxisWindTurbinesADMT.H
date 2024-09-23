@@ -241,7 +241,7 @@ private:
             DynamicList<scalar> torqueGen;
 
             //- Initial blade pitch (degrees) of all blades.
-            DynamicList<scalar> pitch;
+            DynamicList<scalar> ipitch;
 
             //- list of 1D arrays of teeter variables, with 0 being the (initial) 
             // turbine teeter (degrees) of the turbine and 1 being the derivative
@@ -367,9 +367,6 @@ private:
             //- Engage a blade pitch rate limiter.
             DynamicList<bool> BladePitchRateLimiter;
 
-            //- Engage a teeter rate limiter.
-            DynamicList<bool> TeeterRateLimiter;
-
             //- Parameter for low-pass speed filter for control system (Hz).
             DynamicList<scalar> SpeedFilterCornerFrequency;
 
@@ -443,8 +440,13 @@ private:
                 //- Maximum Teeter (degrees). 
                 DynamicList<scalar> TeeterMax;
 
-                //- Selected Solver type.
-                DynamicList<dictionary> TeeterSolverDicts;
+                //- Teeter Offset (degrees) for coupling current azimuth to the 
+                // maximum pitch angle, positive will be moved forward, en negative
+                // will be backwards, always in rotation direction of the blades. 
+                DynamicList<scalar> TeeterOffset;
+
+                //- Delta 3 angle (degrees). 
+                DynamicList<scalar> delta3;
 
                 //- integration initial step (stepsize within ODE)
                 DynamicList<scalar> TeeterODEdtEst;
@@ -454,14 +456,18 @@ private:
                 // turbine may differ.  
                 DynamicList<flapODE> flapODEs;
 
+                //- Dictionary to hold solver settings
+                dictionary SolverDict;
+                
+                //- Dynamic list to hold disctionaries of solver settings, it 
+                // differs per distinct turbine, since Initialized variables for 
+                // each turbine may differ.  
+                DynamicList<dictionary> SolverDicts;
+
                 //- Dynamic list to hold odeSolver informations, since each
                 // distinct turbine does have a different ode, they may 
                 // require different solver settings. 
                 DynamicList<autoPtr<ODESolver> > ODESolvers;
-
-                //- Maximum rate of change of teeter (degree/s).
-                DynamicList<scalar> RateLimitTeeter;
-
 
             //- Nacelle yaw control parameters
                 //- Moment of intertia rate of change of nacelle yaw (degrees/s).
@@ -618,6 +624,9 @@ private:
         //- Information critical to turbine performance that can be written to file
         //  every time step.
 
+            //- Pitch at each actuator point.
+            DynamicList<List<List<scalar> > > pitch;
+
             //- Angle of attack at each actuator point.
             DynamicList<List<List<scalar> > > alpha;
             DynamicList<List<List<scalar> > > alphaSecAvg;
@@ -734,7 +743,7 @@ private:
             OFstream* nacYawFile_;
 
             //- List of output files for turbine grid coordinates. 
-            OFstream* bladePoints_;
+            OFstream* bladePointsFile_;
 
       
           
