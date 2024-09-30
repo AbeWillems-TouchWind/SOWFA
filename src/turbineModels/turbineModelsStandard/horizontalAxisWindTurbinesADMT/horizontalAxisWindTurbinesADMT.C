@@ -311,11 +311,6 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
             PitchControlKI.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchControlKI")));
             PitchControlKD.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchControlKD")));
         }
-        else if (BladePitchControllerType[i] == "teeter")
-        {
-            PitchMin.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchMin")));
-            PitchMax.append(readScalar(turbineProperties.subDict("BladePitchControllerParams").lookup("PitchMax")));
-        }
 
 
         if (GenTorqueControllerType[i] == "none")
@@ -674,6 +669,7 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
         bladePointsPerturbVector.append(List<List<vector> >(nRadial[i]));
         elementAzimuth.append(List<List<scalar> >(nRadial[i]));
         bladeForce.append(List<List<vector> >(nRadial[i]));
+        bladeForcePC.append(List<List<vector> >(nRadial[i]));
         bladeAlignedVectors.append(List<List<List<vector > > >(nRadial[i]));
         windVectors.append(List<List<vector> >(nRadial[i]));
         pitch.append(List<List<scalar> >(nRadial[i]));
@@ -700,6 +696,7 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
             bladePointsPerturbVector[i][m].append(List<vector>(nAzimuth[i][m],vector::zero));
             elementAzimuth[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
             bladeForce[i][m].append(List<vector>(nAzimuth[i][m],vector::zero));
+            bladeForcePC[i][m].append(List<vector>(nAzimuth[i][m],vector::zero));
             bladeAlignedVectors[i][m].append(List<List<vector> >(nAzimuth[i][m]));
             for(int n = 0; n < nAzimuth[i][m]; n++)
             {
@@ -860,7 +857,7 @@ void horizontalAxisWindTurbinesADMT::rotateBlades()
       //    forAll(bladePoints[i][j], k)
       //    {
       //        bladePoints[i][j][k] = rotatePoint(bladePoints[i][j][k], rotorApex[i], uvShaft[i], deltaAzimuthI);
-      //        polarbladePoints[i][j][k] = XYZtoPolar(bladePoints[i][m][k], rotorApex[i], uvShaft[i], uvBladePlane[i]);
+      //        //polarbladePoints[i][j][k] = XYZtoPolar(bladePoints[i][m][k], rotorApex[i], uvShaft[i], uvBladePlane[i]);
       //    }
       //}   
 
@@ -902,7 +899,7 @@ void horizontalAxisWindTurbinesADMT::yawNacelle()
             forAll(bladePoints[i][j], k)
             {
                 bladePoints[i][j][k] = rotatePoint(bladePoints[i][j][k], towerShaftIntersect[i], uvTower[i], deltaNacYaw[i]);
-                polarbladePoints[i][j][k] = XYZtoPolar(bladePoints[i][j][k], rotorApex[i], uvShaft[i], uvBladePlane[i]);
+                //polarbladePoints[i][j][k] = XYZtoPolar(bladePoints[i][j][k], rotorApex[i], uvShaft[i], uvBladePlane[i]);
             }
         }   
 
@@ -1437,6 +1434,9 @@ void horizontalAxisWindTurbinesADMT::computeBladeForce()
 
                 // Add up lift and drag to get the resultant force/density applied to this blade element.
                 bladeForce[i][j][k] = (liftVector + dragVector);
+                bladeForcePC[i][j][k][0] = bladeForce[i][j][k] & bladeAlignedVectors[i][j][k][0];
+                bladeForcePC[i][j][k][1] = bladeForce[i][j][k] & bladeAlignedVectors[i][j][k][1];
+                bladeForcePC[i][j][k][2] = bladeForce[i][j][k] & bladeAlignedVectors[i][j][k][2];
 
                 // Find the component of the blade element force/density in the axial (along the shaft)
                 // direction.
@@ -1517,10 +1517,8 @@ void horizontalAxisWindTurbinesADMT::computeBodyForce()
 
 void horizontalAxisWindTurbinesADMT::computeTeeterMoment()
 {
-    scalar current_k_azimuth_left  = 0.0;
-    scalar current_k_azimuth_right = 0.0;
-    scalar current_k_azimuth_left_value  = Foam::constant::mathematical::pi;
-    scalar current_k_azimuth_right_value = Foam::constant::mathematical::pi;
+    scalar current_k_azimuth_left  = -1;
+    scalar current_k_azimuth_right = -1;
 
     forAll(polarbladePoints, i)
     {
@@ -1537,30 +1535,33 @@ void horizontalAxisWindTurbinesADMT::computeTeeterMoment()
         // Proceed blade by blade (or ring i.c.o. actuator disk).
         forAll(polarbladePoints[i], j)
         {
+            scalar dAzimuth = 2.0*Foam::constant::mathematical::pi/nAzimuth[i][j];
+
             // Proceed point by point.
             forAll(polarbladePoints[i][j], k)
             {
                 // Go through all points and save the minim to the current azimuth angle
-                if (MinDifferenceAzimuthbase(azimuth[i], polarbladePoints[i][j][k][1]) < current_k_azimuth_left_value)
+                if (MinDifferenceAzimuthbase(azimuth[i], polarbladePoints[i][j][k][1]) < 0.5*dAzimuth)
                 {
                     current_k_azimuth_left = k;
-                    current_k_azimuth_left_value = MinDifferenceAzimuthbase(azimuth[i], polarbladePoints[i][j][k][1]);
                 }
                 
                 // Go through all points and save the minimum of the 180 opposite blade to the current azimuth angle
-                if (MinDifferenceAzimuthbase(azimuth_R, polarbladePoints[i][j][k][1]) < current_k_azimuth_right_value)
+                if (MinDifferenceAzimuthbase(azimuth_R, polarbladePoints[i][j][k][1]) < 0.5*dAzimuth)
                 {
                     current_k_azimuth_right = k;
-                    current_k_azimuth_right_value = MinDifferenceAzimuthbase(azimuth_R, polarbladePoints[i][j][k][1]);
                 }
             }
 
-            // Multiply the maximum and mimumum indixes with the radius and sum amoung the azumuth line
-            AzimuthMomentumSum[i] += polarbladePoints[i][j][current_k_azimuth_left][0] * bladeForce[i][j][current_k_azimuth_left][0] - polarbladePoints[i][j][current_k_azimuth_right][0] * bladeForce[i][j][current_k_azimuth_right][0];
-
-            // reset left and right k
-            current_k_azimuth_left_value  = Foam::constant::mathematical::pi;
-            current_k_azimuth_right_value = Foam::constant::mathematical::pi;
+            if ((current_k_azimuth_left == -1) || (current_k_azimuth_right == -1))
+            {
+                Info << "Compute Teeter Moment went wrong, no k value" << endl;
+            }
+            else
+            {
+                // Multiply the maximum and mimumum indixes with the radius and sum amoung the azumuth line
+                AzimuthMomentumSum[i] += polarbladePoints[i][j][current_k_azimuth_left][0] * bladeForcePC[i][j][current_k_azimuth_left][0] - polarbladePoints[i][j][current_k_azimuth_right][0] * bladeForcePC[i][j][current_k_azimuth_right][0];
+            }
         }
     }
 }
@@ -2017,6 +2018,15 @@ void horizontalAxisWindTurbinesADMT::openOutputFiles()
         // Create a turbine grid coordinate file in turbine polar coordinates. 
         bladePointsFile_ = new OFstream(rootDir/time/"bladePointsPC");
         *bladePointsFile_ << "#Turbine    Time(s)    dt(s)    polar coordinates [R(m) Azimuth(degrees) Phi(degrees)]" << endl;
+
+        bladeForceFile_ = new OFstream(rootDir/time/"bladeForce");
+        *bladeForceFile_ << "#Turbine    Time(s)    dt(s)    blade forces [x y z] (N)" << endl;
+
+        bladeForcePCFile_ = new OFstream(rootDir/time/"bladeForcePC");
+        *bladeForcePCFile_ << "#Turbine    Time(s)    dt(s)    blade forces [R Azimuth Phi] (N)" << endl;
+
+        AzimuthMomentumSumFile_ = new OFstream(rootDir/time/"moment");
+        *AzimuthMomentumSumFile_ << "#Turbine    Time(s)    dt(s)    Moment (Nm)" << endl;
     }
 }
 
@@ -2038,6 +2048,7 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
             *azimuthFile_ << i << " " << time << " " << dt << " ";
             *teeterFile_ << i << " " << time << " " << dt << " ";
             *nacYawFile_ << i << " " << time << " " << dt << " ";
+            *AzimuthMomentumSumFile_ << i << " " << time << " " << dt << " ";
 
             // Write out information for each turbine.
             *torqueRotorFile_ << torqueRotor[i]*fluidDensity[i] << endl;
@@ -2050,6 +2061,7 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
             *azimuthFile_ << azimuth[i]/degRad << endl;
             *teeterFile_ << teeter[i][0]/degRad << endl;
             *nacYawFile_ << standardToCompass(nacYaw[i]/degRad) << endl;
+            *AzimuthMomentumSumFile_ << AzimuthMomentumSum[i] << endl;
 
             // Proceed sector by sector.
             forAll(alphaSecAvg[i], j)
@@ -2100,6 +2112,8 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
             // Write out time and delta t.
             *bladePointsFile_ << i << " " << time << " " << dt << " ";
             *pitchFile_ << i << " " << time << " " << dt << " ";
+            *bladeForceFile_ << i << " " << time << " " << dt << " ";
+            *bladeForcePCFile_ << i << " " << time << " " << dt << " ";
             
             // Proceed blade by blade. 
             forAll(bladePoints[i], j)
@@ -2110,11 +2124,15 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
                     // Write out values
                     *bladePointsFile_   << "(" << polarbladePoints[i][j][k][0] << " " << (polarbladePoints[i][j][k][1] / degRad) << " " << (polarbladePoints[i][j][k][2] / degRad) << ") ";
                     *pitchFile_ << pitch[i][j][k]/degRad << " ";
+                    *bladeForceFile_ << bladeForce[i][j][k] << " ";
+                    *bladeForcePCFile_ << bladeForcePC[i][j][k] << " ";
                 }
             }
             // End lines
             *bladePointsFile_ << endl;
             *pitchFile_ << endl;
+            *bladeForceFile_ << endl;
+            *bladeForcePCFile_ << endl;
         }
         
         // End lines
@@ -2128,6 +2146,7 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
         *azimuthFile_ << endl;
         *teeterFile_ << endl;
         *nacYawFile_ << endl;
+        *AzimuthMomentumSumFile_ << endl;
 
         *alphaFile_ << endl;
         *VmagFile_ << endl;
@@ -2143,6 +2162,8 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
 
         *bladePointsFile_ << endl;
         *pitchFile_ << endl;
+        *bladeForceFile_ << endl;
+        *bladeForcePCFile_ << endl;
     }
 }
 

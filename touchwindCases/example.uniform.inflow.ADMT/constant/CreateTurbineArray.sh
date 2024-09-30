@@ -61,7 +61,7 @@ turbine$ind
     RotSpeed             9.15519863;
     TorqueGen            0.0;
     Pitch                0.0;
-	Teeter			     1.0;
+	Teeter			     0.0;
 	TeeterOffset		 0.0;
     NacYaw             	 $Yaw;
     fluidDensity         1.225;

@@ -593,8 +593,11 @@ private:
         //- Unit vector pointing from rotor apex to the project blade plane tip.
 	    DynamicList<vector> uvBladePlane;
 
-            //- Blade force at each actuator point.
+            //- Blade force at each actuator point, aligned with xyz grid.
             DynamicList<List<List<vector> > > bladeForce;
+            
+            //- Blade force at each actuator point, aligned with blade directions.
+            DynamicList<List<List<vector> > > bladeForcePC;
 
             //- Teeter Moment of the turbine
             DynamicList<scalar> AzimuthMomentumSum;
@@ -745,9 +748,16 @@ private:
             //- List of output files for turbine grid coordinates. 
             OFstream* bladePointsFile_;
 
-      
+            //- List of output files for turbine force values (xyz). 
+            OFstream* bladeForceFile_;
+
+            //- List of output files for turbine force values (polar). 
+            OFstream* bladeForcePCFile_;
+
+            //- List of output files for moment around hinge line. 
+            OFstream* AzimuthMomentumSumFile_;          
           
-    
+
     // Private Member Functions
         
         //- Rotate the blades.
