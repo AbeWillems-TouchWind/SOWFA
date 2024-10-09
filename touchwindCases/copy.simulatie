@@ -8,7 +8,7 @@ if [[ -d $folderdestination ]]; then
 else
 	mkdir $folderdestination && cd $foldertocopy
 	runscriptList=($(ls ./runscript.*))
-	cp -r 0.original/ constant/ system/ setUp userinput.sh ../$folderdestination
+	cp -r 0.original/ constant/ system/ setUp readSettings.sh ../$folderdestination
 	cp -r "${runscriptList[@]}" ../$folderdestination
 	cd ../
 fi 

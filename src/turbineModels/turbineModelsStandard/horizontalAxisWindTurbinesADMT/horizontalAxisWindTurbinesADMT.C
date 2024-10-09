@@ -169,12 +169,14 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
         ipitch.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Pitch"))));
         teeter.append(scalarField(2)); 
         teeter[i][0] = readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("Teeter"));
+        teeter[i][1] = 0.0;
         dteeter.append(scalarField(2));
-        TeeterODEdtEst.append(0.1);
-        TeeterOffset.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("TeeterOffset"))));
+        dteeter[i][0] = 0.0; 
+        dteeter[i][1] = 0.0; 
+        teeterODEdtEst.append(0.1);
+        teeterOffset.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("TeeterOffset"))));
         nacYaw.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("NacYaw"))));
         fluidDensity.append(scalar(readScalar(turbineArrayProperties.subDict(turbineName[i]).lookup("fluidDensity")))); 
-        AzimuthMomentumSum.append(0.0);
     }
 
 
@@ -326,9 +328,10 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
             TeeterMin.append(readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterMin")));
             TeeterMax.append(readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterMax")));
             delta3.append(readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("delta3")));
-            flapODEs.append(flapODE(TeeterI[i], TeeterCa[i], TeeterKa[i], TeeterKcf[i]));
             SolverDict.add("solver", word(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterSolver")));
             SolverDict.add("relTol", readScalar(turbineProperties.subDict("TeeterControllerParams").lookup("TeeterSolverRelTol")));
+
+            flapODEs.append(flapODE(TeeterI[i] / fluidDensity[i], TeeterCa[i] / fluidDensity[i], TeeterKa[i] / fluidDensity[i], TeeterKcf[i] / fluidDensity[i]));
             SolverDicts.append(SolverDict);
             autoPtr<ODESolver> odesolver = ODESolver::New(flapODEs[i], SolverDicts[i]);
             ODESolvers.append(odesolver);
@@ -343,8 +346,6 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
         else if (NacYawControllerType[i] == "timeYawTable")
         {
         }
-
-
 
 
         AirfoilType.append(turbineProperties.lookup("Airfoils"));
@@ -499,15 +500,15 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
     PitchMax = degRad * PitchMax;
     TeeterMin = degRad * TeeterMin; 
     TeeterMax = degRad * TeeterMax;
-    forAll(TeeterOffset,i)
+    forAll(teeterOffset,i)
     {
         if (rotationDir[i] == "cw")
         {
-            TeeterOffset[i] = degRad * TeeterOffset[i];
+            teeterOffset[i] = degRad * teeterOffset[i];
         }
         if (rotationDir[i] == "ccw")
         {
-            TeeterOffset[i] = degRad * -TeeterOffset[i];
+            teeterOffset[i] = degRad * -teeterOffset[i];
         }
     }
     forAll(PreCone,i)
@@ -515,7 +516,6 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
         PreCone[i] = degRad * PreCone[i];
     }
 
-    
 
 
     // Calculate tower shaft intersection and rotor apex locations. (The
@@ -669,7 +669,6 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
         bladePointsPerturbVector.append(List<List<vector> >(nRadial[i]));
         elementAzimuth.append(List<List<scalar> >(nRadial[i]));
         bladeForce.append(List<List<vector> >(nRadial[i]));
-        bladeForcePC.append(List<List<vector> >(nRadial[i]));
         bladeAlignedVectors.append(List<List<List<vector > > >(nRadial[i]));
         windVectors.append(List<List<vector> >(nRadial[i]));
         pitch.append(List<List<scalar> >(nRadial[i]));
@@ -685,6 +684,7 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
         deltaNacYaw.append(0.0);
         deltaAzimuth.append(0.0);
         thrust.append(0.0);
+        moment.append(0.0);
         torqueRotor.append(0.0);
         powerRotor.append(0.0);
         powerGenerator.append(0.0);
@@ -696,7 +696,6 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
             bladePointsPerturbVector[i][m].append(List<vector>(nAzimuth[i][m],vector::zero));
             elementAzimuth[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
             bladeForce[i][m].append(List<vector>(nAzimuth[i][m],vector::zero));
-            bladeForcePC[i][m].append(List<vector>(nAzimuth[i][m],vector::zero));
             bladeAlignedVectors[i][m].append(List<List<vector> >(nAzimuth[i][m]));
             for(int n = 0; n < nAzimuth[i][m]; n++)
             {
@@ -726,6 +725,7 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
         dragSecAvg.append(List<List<scalar> >(nAvgSector[i]));
         axialForceSecAvg.append(List<List<scalar> >(nAvgSector[i]));
         tangentialForceSecAvg.append(List<List<scalar> >(nAvgSector[i]));
+        pitchSecAvg.append(List<List<scalar> >(nAvgSector[i]));
         for(int m = 0; m < nAvgSector[i]; m++)
         {
             windVectorsSecAvg[i][m].append(List<vector>(nRadial[i],vector::zero));
@@ -737,6 +737,7 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
             dragSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
             axialForceSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
             tangentialForceSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
+            pitchSecAvg[i][m].append(List<scalar>(nRadial[i],0.0));
         }
 
 
@@ -819,9 +820,6 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
 
     // Compute the blade forces due to this wind at the initial time step.
     computeBladeForce();
-    
-    // Compute the teeter Moment.
-    computeTeeterMoment();
 
     // Compute the resultant body force at this initial time step.
     computeBodyForce();
@@ -1351,18 +1349,31 @@ void horizontalAxisWindTurbinesADMT::computeBladeForce()
     {
         int m = turbineTypeID[i];
 
-        // Set the total thrust of the turbine to zero.  Thrust will be summed on a blade-element-
+        // Set the total thrust and moment of the turbine to zero.  Thrust will be summed on a blade-element-
         // wise basis.
         thrust[i] = 0.0;
+        moment[i] = 0.0;
 
         // Set the total aerodynamic torque of the turbine to zero.  Thrust will be summed on a blade-element-
         // wise basis.
         torqueRotor[i] = 0.0;
 
+        // For a two bladed system, calculate opposite blade position, this will be used in the moment 
+        // calculation. 
+        scalar azimuth_R = azimuth[i] + Foam::constant::mathematical::pi;
+        if (azimuth_R >= 2.0 * Foam::constant::mathematical::pi)
+        {
+            azimuth_R -= 2.0 * Foam::constant::mathematical::pi;
+        }
+
         // Proceed blade by blade.
         forAll(windVectors[i], j)
         {
-
+            // Find the azimuth distance between the points based on azimuth "ring" in ADM
+            scalar dAzimuth = 2.0*Foam::constant::mathematical::pi/nAzimuth[i][j];
+            scalar indx_current_azimuth = -1;
+            scalar indx_current_azimuth_R = -1;
+            
             // Proceed point by point.
             forAll(windVectors[i][j], k)
             {
@@ -1434,10 +1445,7 @@ void horizontalAxisWindTurbinesADMT::computeBladeForce()
 
                 // Add up lift and drag to get the resultant force/density applied to this blade element.
                 bladeForce[i][j][k] = (liftVector + dragVector);
-                bladeForcePC[i][j][k][0] = bladeForce[i][j][k] & bladeAlignedVectors[i][j][k][0];
-                bladeForcePC[i][j][k][1] = bladeForce[i][j][k] & bladeAlignedVectors[i][j][k][1];
-                bladeForcePC[i][j][k][2] = bladeForce[i][j][k] & bladeAlignedVectors[i][j][k][2];
-
+                
                 // Find the component of the blade element force/density in the axial (along the shaft)
                 // direction.
                 axialForce[i][j][k] = -bladeForce[i][j][k] & uvShaft[i];
@@ -1451,7 +1459,20 @@ void horizontalAxisWindTurbinesADMT::computeBladeForce()
 
                 // Add this blade element's contribution to aerodynamic torque to the total turbine aerodynamic torque.
                 torqueRotor[i] += tangentialForce[i][j][k] * solidity[i][j] * bladeRadius[i][j] * cos(PreCone[m][0]);
+
+                // For the moment calculation, go through all points and save the minim to the current azimuth angle
+                if (MinDifferenceAzimuthbase(azimuth[i], polarbladePoints[i][j][k][1]) <= 0.5*dAzimuth)
+                {
+                    indx_current_azimuth = k;
+                }
+                if (MinDifferenceAzimuthbase(azimuth_R, polarbladePoints[i][j][k][1]) <= 0.5*dAzimuth)
+                {
+                    indx_current_azimuth_R = k;
+                }
+
             }
+
+            moment[i] += polarbladePoints[i][j][indx_current_azimuth][0] * axialForce[i][j][indx_current_azimuth] - polarbladePoints[i][j][indx_current_azimuth_R][0] * axialForce[i][j][indx_current_azimuth_R];
         }
 
         // Compute rotor power based on aerodynamic torque and rotation speed.
@@ -1515,57 +1536,6 @@ void horizontalAxisWindTurbinesADMT::computeBodyForce()
     Info << "Torque from Body Force = " << torqueBodyForceSum << tab << "Torque from Act. Disk = " << torqueSum << tab << "Ratio = " << torqueBodyForceSum/torqueSum << endl;
 }
 
-void horizontalAxisWindTurbinesADMT::computeTeeterMoment()
-{
-    scalar current_k_azimuth_left  = -1;
-    scalar current_k_azimuth_right = -1;
-
-    forAll(polarbladePoints, i)
-    {
-        // Zero out valeus
-        AzimuthMomentumSum[i] *= 0.0;
-        
-        // Calculate opposite azimuth value
-        scalar azimuth_R = azimuth[i] + Foam::constant::mathematical::pi;
-        if (azimuth_R >= 2.0 * Foam::constant::mathematical::pi)
-        {
-            azimuth_R -= 2.0 * Foam::constant::mathematical::pi;
-        }
-
-        // Proceed blade by blade (or ring i.c.o. actuator disk).
-        forAll(polarbladePoints[i], j)
-        {
-            scalar dAzimuth = 2.0*Foam::constant::mathematical::pi/nAzimuth[i][j];
-
-            // Proceed point by point.
-            forAll(polarbladePoints[i][j], k)
-            {
-                // Go through all points and save the minim to the current azimuth angle
-                if (MinDifferenceAzimuthbase(azimuth[i], polarbladePoints[i][j][k][1]) < 0.5*dAzimuth)
-                {
-                    current_k_azimuth_left = k;
-                }
-                
-                // Go through all points and save the minimum of the 180 opposite blade to the current azimuth angle
-                if (MinDifferenceAzimuthbase(azimuth_R, polarbladePoints[i][j][k][1]) < 0.5*dAzimuth)
-                {
-                    current_k_azimuth_right = k;
-                }
-            }
-
-            if ((current_k_azimuth_left == -1) || (current_k_azimuth_right == -1))
-            {
-                Info << "Compute Teeter Moment went wrong, no k value" << endl;
-            }
-            else
-            {
-                // Multiply the maximum and mimumum indixes with the radius and sum amoung the azumuth line
-                AzimuthMomentumSum[i] += polarbladePoints[i][j][current_k_azimuth_left][0] * bladeForcePC[i][j][current_k_azimuth_left][0] - polarbladePoints[i][j][current_k_azimuth_right][0] * bladeForcePC[i][j][current_k_azimuth_right][0];
-            }
-        }
-    }
-}
-
 
 void horizontalAxisWindTurbinesADMT::computeSectorAverage()
 {
@@ -1584,6 +1554,7 @@ void horizontalAxisWindTurbinesADMT::computeSectorAverage()
                 dragSecAvg[i][j][k] = 0.0;
                 axialForceSecAvg[i][j][k] = 0.0;
                 tangentialForceSecAvg[i][j][k] = 0.0;
+                pitchSecAvg[i][j][k] = 0.0; 
 
                 forAll(sectorIndices[i][k], m)
                 {
@@ -1598,6 +1569,7 @@ void horizontalAxisWindTurbinesADMT::computeSectorAverage()
                         dragSecAvg[i][j][k] += drag[i][k][m] / (scalar(nAzimuth[i][k])/scalar(nAvgSector[i]));
                         axialForceSecAvg[i][j][k] += axialForce[i][k][m] / (scalar(nAzimuth[i][k])/scalar(nAvgSector[i]));
                         tangentialForceSecAvg[i][j][k] += tangentialForce[i][k][m] / (scalar(nAzimuth[i][k])/scalar(nAvgSector[i]));
+                        pitchSecAvg[i][j][k] += pitch[i][k][m] / (scalar(nAzimuth[i][k])/scalar(nAvgSector[i]));
                     }
                 }
             }
@@ -1857,9 +1829,6 @@ void horizontalAxisWindTurbinesADMT::update()
     // Compute the blade forces.
     computeBladeForce();
 
-    // Compute the teeter Moment.
-    computeTeeterMoment();
-
     // Project the blade forces as body forces.
     computeBodyForce();
 
@@ -1939,6 +1908,10 @@ void horizontalAxisWindTurbinesADMT::openOutputFiles()
         thrustFile_ = new OFstream(rootDir/time/"thrust");
         *thrustFile_ << "#Turbine    Time(s)    dt(s)    thrust (N)" << endl;
 
+        // Create a total moment file.
+        momentFile_ = new OFstream(rootDir/time/"moment");
+        *momentFile_ << "#Turbine    Time(s)    dt(s)    Moment (Nm)" << endl;
+
         // Create an aerodynamic power file.
         powerRotorFile_ = new OFstream(rootDir/time/"powerRotor");
         *powerRotorFile_ << "#Turbine    Time(s)    dt(s)    rotor power (W)" << endl;
@@ -2014,19 +1987,6 @@ void horizontalAxisWindTurbinesADMT::openOutputFiles()
         // Create a tangential force file.
         tangentialForceFile_ = new OFstream(rootDir/time/"tangentialForce");
         *tangentialForceFile_ << "#Turbine    Sector    Time(s)    dt(s)    tangential force (N)" << endl;
-
-        // Create a turbine grid coordinate file in turbine polar coordinates. 
-        bladePointsFile_ = new OFstream(rootDir/time/"bladePointsPC");
-        *bladePointsFile_ << "#Turbine    Time(s)    dt(s)    polar coordinates [R(m) Azimuth(degrees) Phi(degrees)]" << endl;
-
-        bladeForceFile_ = new OFstream(rootDir/time/"bladeForce");
-        *bladeForceFile_ << "#Turbine    Time(s)    dt(s)    blade forces [x y z] (N)" << endl;
-
-        bladeForcePCFile_ = new OFstream(rootDir/time/"bladeForcePC");
-        *bladeForcePCFile_ << "#Turbine    Time(s)    dt(s)    blade forces [R Azimuth Phi] (N)" << endl;
-
-        AzimuthMomentumSumFile_ = new OFstream(rootDir/time/"moment");
-        *AzimuthMomentumSumFile_ << "#Turbine    Time(s)    dt(s)    Moment (Nm)" << endl;
     }
 }
 
@@ -2041,6 +2001,7 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
             *torqueRotorFile_ << i << " " << time << " " << dt << " ";
             *torqueGenFile_ << i << " " << time << " " << dt << " ";
             *thrustFile_ << i << " " << time << " " << dt << " ";
+            *momentFile_ << i << " " << time << " " << dt << " ";
             *powerRotorFile_ << i << " " << time << " " << dt << " ";
             *powerGeneratorFile_ << i << " " << time << " " << dt << " ";
             *rotSpeedFile_ << i << " " << time << " " << dt << " ";
@@ -2048,12 +2009,12 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
             *azimuthFile_ << i << " " << time << " " << dt << " ";
             *teeterFile_ << i << " " << time << " " << dt << " ";
             *nacYawFile_ << i << " " << time << " " << dt << " ";
-            *AzimuthMomentumSumFile_ << i << " " << time << " " << dt << " ";
 
             // Write out information for each turbine.
             *torqueRotorFile_ << torqueRotor[i]*fluidDensity[i] << endl;
             *torqueGenFile_ << torqueGen[i] << endl;
             *thrustFile_ << thrust[i]*fluidDensity[i] << endl;
+            *momentFile_ << moment[i]*fluidDensity[i] << endl;
             *powerRotorFile_ << powerRotor[i]*fluidDensity[i] << endl;
             *powerGeneratorFile_ << powerGenerator[i] << endl;
             *rotSpeedFile_ << rotSpeed[i]/rpmRadSec << endl;
@@ -2061,7 +2022,6 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
             *azimuthFile_ << azimuth[i]/degRad << endl;
             *teeterFile_ << teeter[i][0]/degRad << endl;
             *nacYawFile_ << standardToCompass(nacYaw[i]/degRad) << endl;
-            *AzimuthMomentumSumFile_ << AzimuthMomentumSum[i] << endl;
 
             // Proceed sector by sector.
             forAll(alphaSecAvg[i], j)
@@ -2078,6 +2038,7 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
                 *dragFile_ << i << " " << j << " " <<  time << " " << dt << " ";
                 *axialForceFile_ << i << " " << j << " " <<  time << " " << dt << " ";
                 *tangentialForceFile_ << i << " " << j << " " <<  time << " " << dt << " ";
+                *pitchFile_ << i << " " << j << " " <<  time << " " << dt << " ";
 
                 // Write out values
                 forAll(alphaSecAvg[i][j], k)
@@ -2093,6 +2054,7 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
                     *dragFile_ << dragSecAvg[i][j][k]*fluidDensity[i] << " ";
                     *axialForceFile_ << axialForceSecAvg[i][j][k]*fluidDensity[i] << " ";
                     *tangentialForceFile_ << tangentialForceSecAvg[i][j][k]*fluidDensity[i] << " ";
+                    *pitchFile_ << pitchSecAvg[i][j][k] << " ";
                 }
                 
                 // End lines
@@ -2107,38 +2069,15 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
                 *dragFile_ << endl;
                 *axialForceFile_ << endl;
                 *tangentialForceFile_ << endl;
+                *pitchFile_ << endl; 
             }
-
-            // Write out time and delta t.
-            *bladePointsFile_ << i << " " << time << " " << dt << " ";
-            *pitchFile_ << i << " " << time << " " << dt << " ";
-            *bladeForceFile_ << i << " " << time << " " << dt << " ";
-            *bladeForcePCFile_ << i << " " << time << " " << dt << " ";
-            
-            // Proceed blade by blade. 
-            forAll(bladePoints[i], j)
-            { 
-                // Proceed point by point.
-                forAll(bladePoints[i][j], k)
-                {
-                    // Write out values
-                    *bladePointsFile_   << "(" << polarbladePoints[i][j][k][0] << " " << (polarbladePoints[i][j][k][1] / degRad) << " " << (polarbladePoints[i][j][k][2] / degRad) << ") ";
-                    *pitchFile_ << pitch[i][j][k]/degRad << " ";
-                    *bladeForceFile_ << bladeForce[i][j][k] << " ";
-                    *bladeForcePCFile_ << bladeForcePC[i][j][k] << " ";
-                }
-            }
-            // End lines
-            *bladePointsFile_ << endl;
-            *pitchFile_ << endl;
-            *bladeForceFile_ << endl;
-            *bladeForcePCFile_ << endl;
         }
         
         // End lines
         *torqueRotorFile_ << endl;
         *torqueGenFile_ << endl;
         *thrustFile_ << endl;
+        *momentFile_ << endl;
         *powerRotorFile_ << endl;
         *powerGeneratorFile_ << endl;
         *rotSpeedFile_ << endl;
@@ -2146,7 +2085,6 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
         *azimuthFile_ << endl;
         *teeterFile_ << endl;
         *nacYawFile_ << endl;
-        *AzimuthMomentumSumFile_ << endl;
 
         *alphaFile_ << endl;
         *VmagFile_ << endl;
@@ -2159,11 +2097,7 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
         *dragFile_ << endl;
         *axialForceFile_ << endl;
         *tangentialForceFile_ << endl;
-
-        *bladePointsFile_ << endl;
         *pitchFile_ << endl;
-        *bladeForceFile_ << endl;
-        *bladeForcePCFile_ << endl;
     }
 }
 

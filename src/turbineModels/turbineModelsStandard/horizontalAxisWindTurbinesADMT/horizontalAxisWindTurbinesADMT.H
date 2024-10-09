@@ -248,9 +248,18 @@ private:
             // of the turbine teeter angle. 
             DynamicList<scalarField> teeter;
 
-            //- list of 1D arrays of teeter variables described in equation of 
-            // motion state. 
+            //- list of 1D arrays of teeter derivative variables described in equation of 
+            // motion state. with 0 being the (initial) turbine teeter derivative and 1 
+            // being the turbine teeter second derivative. 
             DynamicList<scalarField> dteeter; 
+
+            //- integration initial step (stepsize within ODE)
+            DynamicList<scalar> teeterODEdtEst;
+
+            //- Teeter Offset (degrees) for coupling current azimuth to the 
+            // maximum pitch angle, positive will be moved forward, en negative
+            // will be backwards, always in rotation direction of the blades. 
+            DynamicList<scalar> teeterOffset;
 
             //- Initial or fixed nacelle yaw angle.  Direction that the turbine
             //  is pointed in cardinal directions (i.e. 0 = north, 90 = east, 
@@ -440,24 +449,16 @@ private:
                 //- Maximum Teeter (degrees). 
                 DynamicList<scalar> TeeterMax;
 
-                //- Teeter Offset (degrees) for coupling current azimuth to the 
-                // maximum pitch angle, positive will be moved forward, en negative
-                // will be backwards, always in rotation direction of the blades. 
-                DynamicList<scalar> TeeterOffset;
-
                 //- Delta 3 angle (degrees). 
                 DynamicList<scalar> delta3;
 
-                //- integration initial step (stepsize within ODE)
-                DynamicList<scalar> TeeterODEdtEst;
+                //- Dictionary to hold solver settings
+                dictionary SolverDict;
                 
                 //- Dynamic list to hold flapODE instances, it differs per
                 // distinct turbine, since Initialized variables for each 
                 // turbine may differ.  
                 DynamicList<flapODE> flapODEs;
-
-                //- Dictionary to hold solver settings
-                dictionary SolverDict;
                 
                 //- Dynamic list to hold disctionaries of solver settings, it 
                 // differs per distinct turbine, since Initialized variables for 
@@ -595,12 +596,6 @@ private:
 
             //- Blade force at each actuator point, aligned with xyz grid.
             DynamicList<List<List<vector> > > bladeForce;
-            
-            //- Blade force at each actuator point, aligned with blade directions.
-            DynamicList<List<List<vector> > > bladeForcePC;
-
-            //- Teeter Moment of the turbine
-            DynamicList<scalar> AzimuthMomentumSum;
 
             //- Three vectors for each blade of each turbine that define the local
             //  blade-aligned coordinate system.  Vector 0 is along the blade pointed
@@ -629,6 +624,7 @@ private:
 
             //- Pitch at each actuator point.
             DynamicList<List<List<scalar> > > pitch;
+            DynamicList<List<List<scalar> > > pitchSecAvg;
 
             //- Angle of attack at each actuator point.
             DynamicList<List<List<scalar> > > alpha;
@@ -665,6 +661,9 @@ private:
 
             //- Thrust on turbine.
             DynamicList<scalar> thrust;
+
+            //- Moment on turbine around hinge.
+            DynamicList<scalar> moment;
 
             //- Total rotor torque/density on turbine.
             DynamicList<scalar> torqueRotor;
@@ -721,6 +720,9 @@ private:
             //- List of output files for total thrust/density.
             OFstream* thrustFile_;
 
+            //- List of output files for moment around hinge line. 
+            OFstream* momentFile_;
+
             //- List of output files for total power/density.
             OFstream* powerRotorFile_;
             
@@ -743,19 +745,17 @@ private:
             OFstream* teeterFile_;
 
             //- List of output files for nacelle yaw angle.
-            OFstream* nacYawFile_;
+            OFstream* nacYawFile_;          
 
             //- List of output files for turbine grid coordinates. 
-            OFstream* bladePointsFile_;
+            //OFstream* bladePointsFile_;
 
             //- List of output files for turbine force values (xyz). 
-            OFstream* bladeForceFile_;
+            //OFstream* bladeForceFile_;
 
             //- List of output files for turbine force values (polar). 
-            OFstream* bladeForcePCFile_;
-
-            //- List of output files for moment around hinge line. 
-            OFstream* AzimuthMomentumSumFile_;          
+            //OFstream* bladeForcePCFile_;
+            
           
 
     // Private Member Functions
@@ -793,14 +793,11 @@ private:
         //  coordinates at each actuator point.
 	void computeWindVectors();
 
-        //- Compute blade forces.
+        //- Compute blade forces and moments.
         void computeBladeForce();
         
         //- Compute body forces.
         void computeBodyForce();
-
-        //- Compute teeter moment on azimuth angle line.
-        void computeTeeterMoment();
 
         //- Compute azimuthal sector averages of blade quantities.
         void computeSectorAverage();
