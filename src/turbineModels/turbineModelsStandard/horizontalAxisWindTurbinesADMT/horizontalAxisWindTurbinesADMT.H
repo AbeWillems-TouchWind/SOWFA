@@ -597,6 +597,9 @@ private:
             //- Blade force at each actuator point, aligned with xyz grid.
             DynamicList<List<List<vector> > > bladeForce;
 
+            //- Blade force at each actuator point, aligned with turbine polar grid.
+            DynamicList<List<List<vector> > > bladeForcePC;
+
             //- Three vectors for each blade of each turbine that define the local
             //  blade-aligned coordinate system.  Vector 0 is along the blade pointed
             //  from root to tip, vector 1 is in the tangential direction (direction
@@ -748,13 +751,19 @@ private:
             OFstream* nacYawFile_;          
 
             //- List of output files for turbine grid coordinates. 
-            //OFstream* bladePointsFile_;
+            OFstream* bladePointsFile_;
 
             //- List of output files for turbine force values (xyz). 
             //OFstream* bladeForceFile_;
 
             //- List of output files for turbine force values (polar). 
-            //OFstream* bladeForcePCFile_;
+            OFstream* bladeForcePCFile_;
+
+            //- List of output files for turbine thrust values (per point). 
+            OFstream* axialForceAllFile_;
+
+            //- List of output files for turbine thrust values (per point). 
+            OFstream* VaxialAllFile_;
             
           
 

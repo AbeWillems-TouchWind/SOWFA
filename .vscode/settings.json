@@ -11,6 +11,7 @@
         "horizontalAxisWindTurbinesALMOpenFAST.C": "cpp",
         "flapequation.C": "cpp",
         "windPlantSolver.C": "cpp",
-        "flapODE.C": "cpp"
+        "flapODE.C": "cpp",
+        "horizontalAxisWindTurbinesALMAdvanced.C": "cpp"
     }
 }

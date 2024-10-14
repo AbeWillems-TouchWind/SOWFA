@@ -103,3 +103,7 @@ touchwindCases/**/[0-9]*/
 
 # Ignore any folder that consists of only digits (e.g., 0, 100, 101, 200, etc.)
 touchwindCases/**/turbineOutput/
+
+# Ignore any file that consists of only digits (e.g., 0, 100, 101, 200, etc.)
+touchwindCases/**/log.*
+

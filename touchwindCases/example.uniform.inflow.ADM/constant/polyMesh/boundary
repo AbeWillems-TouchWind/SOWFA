@@ -32,26 +32,26 @@ FoamFile
     west
     {
         type            patch;
-        nFaces          4500;
+        nFaces          1890;
         startFace       564810;
     }
     east
     {
         type            patch;
-        nFaces          4500;
-        startFace       569310;
+        nFaces          1890;
+        startFace       566700;
     }
     north
     {
         type            patch;
-        nFaces          1890;
-        startFace       573810;
+        nFaces          4500;
+        startFace       568590;
     }
     south
     {
         type            patch;
-        nFaces          1890;
-        startFace       575700;
+        nFaces          4500;
+        startFace       573090;
     }
 )
 
