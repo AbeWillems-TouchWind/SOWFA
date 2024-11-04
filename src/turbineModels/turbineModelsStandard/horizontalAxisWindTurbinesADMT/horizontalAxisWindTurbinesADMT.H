@@ -668,6 +668,12 @@ private:
             //- Moment on turbine around hinge.
             DynamicList<scalar> moment;
 
+            //- Moment on turbine around b1.
+            DynamicList<scalar> momentb1;
+
+            //- Moment on turbine around b2.
+            DynamicList<scalar> momentb2;
+            
             //- Total rotor torque/density on turbine.
             DynamicList<scalar> torqueRotor;
 
@@ -725,6 +731,12 @@ private:
 
             //- List of output files for moment around hinge line. 
             OFstream* momentFile_;
+
+            //- List of output files for momentb1 around hinge line. 
+            OFstream* momentb1File_;
+
+            //- List of output files for momentb2 around hinge line. 
+            OFstream* momentb2File_;
 
             //- List of output files for total power/density.
             OFstream* powerRotorFile_;

@@ -35,6 +35,7 @@ License
 
 #include "horizontalAxisWindTurbinesADMT.H"
 #include "interpolateXY.H"
+//#include <cmath>
 
 namespace Foam
 {
@@ -685,7 +686,12 @@ horizontalAxisWindTurbinesADMT::horizontalAxisWindTurbinesADMT
         deltaNacYaw.append(0.0);
         deltaAzimuth.append(0.0);
         thrust.append(0.0);
+        
         moment.append(0.0);
+        //Calculate mometns per blade
+        momentb2.append(0.0);
+        momentb1.append(0.0);
+
         torqueRotor.append(0.0);
         powerRotor.append(0.0);
         powerGenerator.append(0.0);
@@ -1355,7 +1361,8 @@ void horizontalAxisWindTurbinesADMT::computeBladeForce()
         // wise basis.
         thrust[i] = 0.0;
         moment[i] = 0.0;
-
+        momentb1[i] = 0.0;
+        momentb2[i] = 0.0;
         // Set the total aerodynamic torque of the turbine to zero.  Thrust will be summed on a blade-element-
         // wise basis.
         torqueRotor[i] = 0.0;
@@ -1372,10 +1379,11 @@ void horizontalAxisWindTurbinesADMT::computeBladeForce()
         forAll(windVectors[i], j)
         {
             // Find the azimuth distance between the points based on azimuth "ring" in ADM
-            scalar dAzimuth = 2.0*Foam::constant::mathematical::pi/nAzimuth[i][j];
-            scalar indx_current_azimuth = -1;
-            scalar indx_current_azimuth_R = -1;
-            
+            scalar indx_current_azimuth = 0;
+            scalar indx_current_azimuth_R = 0;
+            scalar minDiff = 2.0 * Foam::constant::mathematical::pi;
+            scalar minDiff_R = 2.0 * Foam::constant::mathematical::pi;
+
             // Proceed point by point.
             forAll(windVectors[i][j], k)
             {
@@ -1465,18 +1473,40 @@ void horizontalAxisWindTurbinesADMT::computeBladeForce()
                 // Add this blade element's contribution to aerodynamic torque to the total turbine aerodynamic torque.
                 torqueRotor[i] += tangentialForce[i][j][k] * solidity[i][j] * bladeRadius[i][j] * cos(PreCone[m][0]);
 
-                // For the moment calculation, go through all points and save the minim to the current azimuth angle
-                if (MinDifferenceAzimuthbase(azimuth[i], polarbladePoints[i][j][k][1]) <= 0.5*dAzimuth)
+                // Compute the azumthal difference of the current point wrt the blade's location.
+                scalar diff = fabs(fmod(azimuth[i] - polarbladePoints[i][j][k][1] + 3* Foam::constant::mathematical::pi, 2* Foam::constant::mathematical::pi) - Foam::constant::mathematical::pi);
+                scalar diff_R = fabs(fmod(azimuth[i] + Foam::constant::mathematical::pi - polarbladePoints[i][j][k][1] + 3 * Foam::constant::mathematical::pi, 2 * Foam::constant::mathematical::pi) - Foam::constant::mathematical::pi);
+                
+                //Info << "diff = " << diff << tab << i <<tab<< j <<tab<< k << endl;
+
+                // Check if difference is less than previous value.
+                if (diff < minDiff)
                 {
                     indx_current_azimuth = k;
+                    minDiff = diff;
+
+
+
                 }
-                if (MinDifferenceAzimuthbase(azimuth_R, polarbladePoints[i][j][k][1]) <= 0.5*dAzimuth)
+                if (diff_R < minDiff_R)
                 {
                     indx_current_azimuth_R = k;
+                    minDiff_R = diff_R;
                 }
 
             }
 
+
+            //Info << "minDiff = " << minDiff << endl;
+            //Info << "Azim blade1 = " << azimuth[i] << tab << "point on grid  = " << polarbladePoints[i][j][indx_current_azimuth][1] << endl;
+            //Info << "Azim blade2 = " << azimuth[i] + M_PI << tab << "point on grid  = " << polarbladePoints[i][j][indx_current_azimuth_R][1] << endl;
+            //Info << "Force blade 1 = " << bladeForcePC[i][j][indx_current_azimuth][0] << "Force blade 2 = " << bladeForcePC[i][j][indx_current_azimuth_R][0] << endl;
+            //Info << "Moment blade 1 = " << polarbladePoints[i][j][indx_current_azimuth][0] * bladeForcePC[i][j][indx_current_azimuth][0] << "Moment blade 2 = " << polarbladePoints[i][j][indx_current_azimuth_R][0] * bladeForcePC[i][j][indx_current_azimuth_R][0] << endl;
+
+            //Info << "================================================================= " << endl;
+
+            //momentb1[i] += polarbladePoints[i][j][indx_current_azimuth][0] * bladeForcePC[i][j][indx_current_azimuth][0];
+            //momentb2[i] += polarbladePoints[i][j][indx_current_azimuth_R][0] * bladeForcePC[i][j][indx_current_azimuth_R][0];
             moment[i] += polarbladePoints[i][j][indx_current_azimuth][0] * bladeForcePC[i][j][indx_current_azimuth][0] - polarbladePoints[i][j][indx_current_azimuth_R][0] * bladeForcePC[i][j][indx_current_azimuth_R][0];
         }
 
@@ -1917,6 +1947,14 @@ void horizontalAxisWindTurbinesADMT::openOutputFiles()
         momentFile_ = new OFstream(rootDir/time/"moment");
         *momentFile_ << "#Turbine    Time(s)    dt(s)    Moment (Nm)" << endl;
 
+        // Create a total momentb1 file.
+        momentb1File_ = new OFstream(rootDir / time / "momentb1");
+        *momentb1File_ << "#Turbine    Time(s)    dt(s)    Moment (Nm)" << endl;
+
+        // Create a total momentb2 file.
+        momentb2File_ = new OFstream(rootDir / time / "momentb2");
+        *momentb2File_ << "#Turbine    Time(s)    dt(s)    Moment (Nm)" << endl;
+
         // Create an aerodynamic power file.
         powerRotorFile_ = new OFstream(rootDir/time/"powerRotor");
         *powerRotorFile_ << "#Turbine    Time(s)    dt(s)    rotor power (W)" << endl;
@@ -2023,6 +2061,8 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
             *torqueGenFile_ << i << " " << time << " " << dt << " ";
             *thrustFile_ << i << " " << time << " " << dt << " ";
             *momentFile_ << i << " " << time << " " << dt << " ";
+            *momentb1File_ << i << " " << time << " " << dt << " ";
+            *momentb2File_ << i << " " << time << " " << dt << " ";
             *powerRotorFile_ << i << " " << time << " " << dt << " ";
             *powerGeneratorFile_ << i << " " << time << " " << dt << " ";
             *rotSpeedFile_ << i << " " << time << " " << dt << " ";
@@ -2036,6 +2076,8 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
             *torqueGenFile_ << torqueGen[i] << endl;
             *thrustFile_ << thrust[i]*fluidDensity[i] << endl;
             *momentFile_ << moment[i]*fluidDensity[i] << endl;
+            *momentb1File_ << momentb1[i] * fluidDensity[i] << endl;
+            *momentb2File_ << momentb2[i] * fluidDensity[i] << endl;
             *powerRotorFile_ << powerRotor[i]*fluidDensity[i] << endl;
             *powerGeneratorFile_ << powerGenerator[i] << endl;
             *rotSpeedFile_ << rotSpeed[i]/rpmRadSec << endl;
@@ -2127,6 +2169,8 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
         *torqueGenFile_ << endl;
         *thrustFile_ << endl;
         *momentFile_ << endl;
+        *momentb1File_ << endl;
+        *momentb2File_ << endl;
         *powerRotorFile_ << endl;
         *powerGeneratorFile_ << endl;
         *rotSpeedFile_ << endl;
@@ -2159,19 +2203,19 @@ void horizontalAxisWindTurbinesADMT::printOutputFiles()
 
 void horizontalAxisWindTurbinesADMT::printDebug()
 {
-    Info << "Print Debugging Information" << endl;
-    Info << "turbineType = " << turbineType << endl;
-    Info << "baseLocation = " << baseLocation << endl;
-    Info << "nRadial = " << nRadial << endl;
-    Info << "pointDistType = " << pointDistType << endl;
-    Info << "epsilon = " << epsilon << endl;
-    Info << "projectionRadius = " << projectionRadius << endl;
-    Info << "azimuth = " << azimuth << endl;
-    Info << "rotSpeed = " << rotSpeed << endl;
-    Info << "pitch = " << pitch << endl;
-    Info << "teeter = " << teeter << endl;
-    Info << "delta3 = " << delta3 << endl;
-    Info << "nacYaw = " << nacYaw << endl << endl << endl;
+    //Info << "Print Debugging Information" << endl;
+    //Info << "turbineType = " << turbineType << endl;
+    //Info << "azimuth = " << azimuth << endl;
+    //Info << "nRadial = " << nRadial << endl;
+    //Info << "pointDistType = " << pointDistType << endl;
+    //Info << "epsilon = " << epsilon << endl;
+    //Info << "projectionRadius = " << projectionRadius << endl;
+    //Info << "baseLocation = " << baseLocation << endl;
+    //Info << "rotSpeed = " << rotSpeed << endl;
+    //Info << "pitch = " << pitch << endl;
+    //Info << "teeter = " << teeter << endl;
+    //Info << "delta3 = " << delta3 << endl;
+    //Info << "nacYaw = " << nacYaw << endl << endl << endl;
     
     Info << "numTurbinesDistinct = " << numTurbinesDistinct << endl;
     Info << "turbineTypeDistinct = " << turbineTypeDistinct << endl;
