@@ -1337,6 +1337,9 @@ void horizontalAxisWindTurbinesADM::computeBladeForce()
 
                 // Add this blade element's contribution to aerodynamic torque to the total turbine aerodynamic torque.
                 torqueRotor[i] += tangentialForce[i][j][k] * solidity[i][j] * bladeRadius[i][j] * cos(PreCone[m][0]);
+
+                tangentialForce[i][j][k] = 0.0;
+
             }
         }
 

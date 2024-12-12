@@ -619,7 +619,7 @@ private:
             //- Total power of turbine according to simplified calculations.
             DynamicList<scalar> powerRotorSimplified;
              
-
+            DynamicList<List<List<vector> > > polarbladePoints;
 
 
         //- Output Data File Information.
@@ -700,6 +700,13 @@ private:
 
             //- List of output files for nacelle yaw angle.
             OFstream* TotalForceTurbineSimplifiedFile_;
+            //- List of output files for turbine thrust values (per point). 
+            OFstream* VaxialAllFile_;
+            OFstream* bladePointsFile_;
+
+            OFstream* BladePointX_;
+            OFstream* BladePointY_;
+            OFstream* BladePointZ_;
 
             
 
@@ -750,6 +757,7 @@ private:
         //- Rotates a point about a rotation axis and rotation point by the specified
         //  angle in radians.
         vector rotatePoint(vector point, vector rotationPoint, vector axis, scalar angle);
+        vector XYZtoPolar(vector point, vector centerPoint, vector axis, vector perpaxis);
 
         //- Perform interpolation.
         scalar interpolate(scalar xNew, DynamicList<scalar>& xOld, DynamicList<scalar>& yOld);

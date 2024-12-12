@@ -617,6 +617,8 @@ horizontalAxisWindTurbinesADMUniform::horizontalAxisWindTurbinesADMUniform
         sectorIndices.append(List<List<label> >(nRadial[i]));
         bladePoints.append(List<List<vector> >(nRadial[i]));
         bladePointsPerturbVector.append(List<List<vector> >(nRadial[i]));
+        polarbladePoints.append(List<List<vector> >(nRadial[i]));
+
         elementAzimuth.append(List<List<scalar> >(nRadial[i]));
         // bladeForce.append(List<List<vector> >(nRadial[i]));
         bladeForceSimplified.append(List<List<vector> >(nRadial[i]));
@@ -651,6 +653,8 @@ horizontalAxisWindTurbinesADMUniform::horizontalAxisWindTurbinesADMUniform
             bladePoints[i][m].append(List<vector>(nAzimuth[i][m],vector::zero));
             bladePointsPerturbVector[i][m].append(List<vector>(nAzimuth[i][m],vector::zero));
             elementAzimuth[i][m].append(List<scalar>(nAzimuth[i][m],0.0));
+            polarbladePoints[i][m].append(List<vector>(nAzimuth[i][m], vector::zero));
+
             // bladeForce[i][m].append(List<vector>(nAzimuth[i][m],vector::zero));
             bladeForceSimplified[i][m].append(List<vector>(nAzimuth[i][m],vector::zero));
             bladeAlignedVectors[i][m].append(List<List<vector> >(nAzimuth[i][m]));
@@ -735,6 +739,8 @@ horizontalAxisWindTurbinesADMUniform::horizontalAxisWindTurbinesADMUniform
                {
                    bladePoints[i][m][k] = rotatePoint(bladePoints[i][m][k], rotorApex[i], uvShaft[i], elementAzimuth[i][m][k]);
                }
+               //polarbladePoints[i][m][k] = XYZtoPolar(bladePoints[i][m][k], rotorApex[i], uvShaft[i], uvBladePlane[i]);
+
             }
             dist = dist + 0.5*dr[i][m];
         }
@@ -1462,6 +1468,8 @@ void horizontalAxisWindTurbinesADMUniform::computeBodyForce()
     // Print information comparing the actual thrust and torque to the integrated body force.
     Info << "Thrust from Body Force = " << thrustBodyForceSum << tab << "Thrust from Act. Disk = " << thrustSum << tab << "Ratio = " << thrustBodyForceSum/thrustSum << endl;
     Info << "Torque from Body Force = " << torqueBodyForceSum << tab << "Torque from Act. Disk = " << torqueSum << tab << "Ratio = " << torqueBodyForceSum/torqueSum << endl;
+    Info << "Torque from Body Force = " << torqueBodyForceSum << tab << "Torque from Act. Disk = " << torqueSum << tab << "Ratio = " << torqueBodyForceSum / torqueSum << endl;
+
 }
 
 
@@ -1504,6 +1512,35 @@ void horizontalAxisWindTurbinesADMUniform::computeSectorAverage()
     }
 }
 
+vector horizontalAxisWindTurbinesADMUniform::XYZtoPolar(vector point, vector centerPoint, vector axis, vector perpaxis)
+{
+    // Calculate vector from centerPoint to point
+    vector v = point - centerPoint;
+
+    // Radial distance r
+    double r = mag(v);
+
+    // Component of v along the axis
+    vector vAlong = (v & axis) * axis;
+
+    // Projection of v onto the plane orthogonal to the axis
+    vector vPlane = v - vAlong;
+
+    // create 2nd Perpendicular axis 
+    vector perp2axis = axis ^ perpaxis;
+
+    // Compute the azimuthal angle theta
+    double theta = Foam::atan2(vPlane & perp2axis, vPlane & perpaxis);
+    if (theta < 0)
+    {
+        theta += 2 * Foam::constant::mathematical::pi;
+    }
+
+    // Compute the polar angle phi (angle between v and the axis)
+    double phi = Foam::asin((v & axis) / r);
+
+    return vector(r, theta, phi);
+}
 
 vector horizontalAxisWindTurbinesADMUniform::rotatePoint(vector point, vector rotationPoint, vector axis, scalar angle)
 {
@@ -1888,6 +1925,26 @@ void horizontalAxisWindTurbinesADMUniform::openOutputFiles()
         // Create VmagN Avg file
         VmagNAvgFile_ = new OFstream(rootDir/time/"VmagNAvg");
         *VmagNAvgFile_ << "#Turbine    Sector    Time(s)    dt(s)    Averaged Normal Velocity component (m/s)" << endl;
+
+        // Create an axial wind speed file for all points
+        VaxialAllFile_ = new OFstream(rootDir / time / "Vaxial_AllPoints");
+        *VaxialAllFile_ << "#Turbine    Time(s)    dt(s)    Vaxial(m/s)" << endl;
+
+        // Create an AD point location file for all points
+        BladePointX_ = new OFstream(rootDir / time / "BladePointX");
+        *BladePointX_ << "#Turbine    Time(s)    dt(s)    X(rad)" << endl;
+
+        // Create an AD point location file for all points
+        BladePointY_ = new OFstream(rootDir / time / "BladePointY");
+        *BladePointY_ << "#Turbine    Time(s)    dt(s)    Y(rad)" << endl;
+
+        // Create an AD point location file for all points
+        BladePointZ_ = new OFstream(rootDir / time / "BladePointZ");
+        *BladePointZ_ << "#Turbine    Time(s)    dt(s)    Z(rad)" << endl;
+
+        // Create a turbine grid coordinate file in turbine polar coordinates. 
+        bladePointsFile_ = new OFstream(rootDir / time / "bladePointsPC");
+        *bladePointsFile_ << "#Turbine    Time(s)    dt(s)    polar coordinates [R(m) Azimuth(degrees) Phi(degrees)]" << endl;
     }
 }
 
@@ -1973,6 +2030,40 @@ void horizontalAxisWindTurbinesADMUniform::printOutputFiles()
                 // *axialForceFile_ << endl;
                 // *tangentialForceFile_ << endl;
             }
+
+            *VaxialAllFile_ << i << " " << time << " " << dt << " ";
+
+            // Proceed blade by blade. 
+            forAll(bladePoints[i], j)
+            {
+
+                // Proceed point by point.
+                forAll(bladePoints[i][j], k)
+                {
+
+                    // Write out values
+                    *VaxialAllFile_ << windVectors[i][j][k].x() << " ";
+
+
+                    if (t < 1)
+                    {
+                        //*bladePointsFile_ << "(" << polarbladePoints[i][j][k][0] << " " << (polarbladePoints[i][j][k][1] / degRad) << " " << (polarbladePoints[i][j][k][2] / degRad) << ") ";
+
+                        *BladePointX_ << bladePoints[i][j][k].x() << " ";
+                        *BladePointY_ << bladePoints[i][j][k].y() << " ";
+                        *BladePointZ_ << bladePoints[i][j][k].z() << " ";
+
+                    }
+
+
+                }
+            }
+            // End lines
+            *VaxialAllFile_ << endl;
+            *BladePointZ_ << endl;
+            *BladePointY_ << endl;
+            *BladePointX_ << endl;
+            //*bladePointsFile_ << endl;
         }
           
         // *torqueRotorFile_ << endl;
@@ -2002,6 +2093,8 @@ void horizontalAxisWindTurbinesADMUniform::printOutputFiles()
         // *dragFile_ << endl;
         // *axialForceFile_ << endl;
         // *tangentialForceFile_ << endl;
+        *VaxialAllFile_ << endl;
+
     }
 }
    
