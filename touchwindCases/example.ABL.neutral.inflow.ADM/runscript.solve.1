@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Read the input settings like cores and starttime from the settings files
+chmod u+rwx ./readSettings.sh
+source ./readSettings.sh
+
+# specialized file userinput.
+runNumber=1                     		# Enter the run number (useful for keeping track of restarts).
+solver=windPlantSolver.ADM		      	# Enter the name of the flow solver.
+
+
+echo "Starting OpenFOAM job at: " $(date)
+echo "using " $cores " cores"
+
+
+# Source the bash profile and then call the appropriate OpenFOAM version function
+# so that all the modules and environment variables get set.
+source ~/.bashrc
+source $HOME/OpenFOAM/OpenFOAM-2.4.0/etc/bashrc
+
+# Get the control dictionary for this particular run.
+cp system/controlDict.$runNumber system/controlDict
+
+# Display the last known time in a separate background process.
+log_file="log.$runNumber.$solver"
+touch "$log_file"  # Ensure the log file exists before the solver starts
+{
+    while true; do
+        last_time=$(grep "Time =" "$log_file" | tail -n 1)
+        if [ -n "$last_time" ]; then
+            echo -ne "At $last_time / $endTime                                 \r"
+        else
+            echo -ne "No time reported yet.                                     \r"
+        fi
+        sleep 5
+    done
+} &  # Run in background
+bg_pid=$!  # Store the background process ID
+
+# Trap to handle Ctrl+C gracefully
+trap 'kill "$bg_pid" 2>/dev/null; exit' INT TERM EXIT
+
+# Run the solver.
+if [ $cores -gt 1 ]; then
+    mpirun -np "$cores" "$solver" -parallel > "log.$runNumber.$solver" 2>&1
+else
+    mpirun -np 1 "$solver" > "log.$runNumber.$solver" 2>&1
+fi
+
+# Kill the background process after the solver finishes
+if kill "$bg_pid" 2>/dev/null; then
+    echo "Time tracking process stopped.                                     "
+else
+    echo "Time tracking process was already finished or could not be stopped."
+fi
+
+echo "Ending OpenFOAM job at: " $(date)

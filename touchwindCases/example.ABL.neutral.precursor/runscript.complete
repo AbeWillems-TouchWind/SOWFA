@@ -1,0 +1,29 @@
+#!/bin/bash
+
+echo " "
+echo "Running preprocess..."
+chmod u+rwx ./runscript.preprocess
+./runscript.preprocess
+
+echo " "
+echo "Running solve 1..."
+chmod u+rwx ./runscript.solve.1
+./runscript.solve.1
+echo "                                                                                                     "
+
+echo " "
+echo "Running solve 2..."
+chmod u+rwx ./runscript.solve.2
+./runscript.solve.2
+echo "                                                                                                     "
+
+echo " "
+echo "Running precursor generation..."
+chmod u+rwx ./runscript.precursor
+./runscript.precursor
+
+echo " "
+echo "Running postprocess..."
+chmod u+rwx ./runscript.postprocess
+./runscript.postprocess
+echo " "

@@ -1,0 +1,80 @@
+#!/bin/bash
+
+
+
+
+# Read the input settings like cores and starttime from the settings files
+echo "   -Reading settings..."
+chmod u+rwx ./readSettings.sh
+source ./readSettings.sh
+
+
+
+# Specilized file Input.
+precursor=1 					# Boolean for wehter or not the postprocessing will perform the actions to get 
+								#   driving data for the turbine simulation
+reconstruct=1					# Boolean for wehter or not to reconstruct decomposed solutions
+delete=1						# Boolean for wheter to delete all processor files
+createVTK=1						# Boolean for wehter or not the postprocessing will perform the actions to create 	
+								#    VTK and zip
+
+
+if [ $reconstruct -eq 1 ]; then
+	if [[ -d ./processor0 ]]; then
+		echo "   -Reconstructing decomposed solution..."
+		if [ $precursor -eq 1 ]; then 
+			if [[ -d $startTime.initialconditions ]]; then
+				rm $startTime.initialconditions
+			fi
+			if [[ -d $startTime ]]; then
+				rm $startTime
+			fi
+
+			reconstructPar -time $startTime -fields '(k kappat nuSgs p_rgh qwall Rwall T U)' > log.reconstructPar.initialconditions 2>&1
+			if [[ -d $startTime ]]; then
+				mv $startTime $startTime.initialconditions
+			fi
+		fi
+		reconstructPar > log.reconstructPar 2>&1
+		
+		foldername=${PWD##*/}
+		foldername+="_initialconditions"
+		if [[ -f ./$foldername.zip ]]; then
+			rm -rf $foldername.zip
+		fi
+		zip -r $foldername.zip $startTime.initialconditions > log.zipinitialconditions 2>&1
+		
+	else
+		echo "   -Reconstructing impossible, no decomposed directories..."
+	fi
+fi
+
+if [ $delete -eq 1 ]; then	
+	if [[ -d ./processor0 ]]; then
+		echo "   -Deleting decomposed directories..."
+		rm -r processor*
+	else
+		echo "   -No decomposed directories..."
+	fi  
+fi   
+   
+
+if [ $createVTK -eq 1 ]; then	   
+	echo "   -Creating VTK to load into paraview..."
+	foamToVTK > log.foamToVTK 2>&1
+
+	foldername=${PWD##*/}
+	foldername+="_vtk"
+	
+	if [[ -d VTK ]]; then
+		mv VTK/ $foldername
+
+		echo "   -Zip VTK folder to reduce download amount..."
+		if [[ -f ./$foldername.zip ]]; then
+			rm -rf $foldername.zip
+		fi
+		zip -r $foldername.zip $foldername/ > log.zipVTK 2>&1
+		rm -rf $foldername/
+	fi
+fi
+

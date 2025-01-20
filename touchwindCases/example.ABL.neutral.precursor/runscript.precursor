@@ -1,0 +1,71 @@
+#!/bin/bash
+
+
+
+
+# Read the input settings like cores and starttime from the settings files
+echo "   -Reading settings..."
+chmod u+rwx ./readSettings.sh
+source ./readSettings.sh
+
+
+
+# Specilized file Input.
+precursor=1 					# Boolean for wehter or not the postprocessing will perform the actions to get 
+								#   driving data for the turbine simulation
+
+
+# Postprocess generate precursor data
+if [ $precursor -eq 1 ]; then
+	if [[ -d postProcessing ]]; then
+		echo "   -Making drivingData..."
+		cd ./postProcessing
+		# Copy files from SOWFA to here and give them adminrights
+		cp -r ~/SOWFA/tools/boundaryDataConversion/* .
+		cp -r ~/SOWFA/tools/boundaryDataConversion/* .
+		chmod u+rwx makeBoundaryDataFiles.$inflowDir.sh
+		chmod u+rwx makeBoundaryDataFiles/data.py
+		chmod u+rwx makeBoundaryDataFiles/points.py
+		
+		cp -r ~/SOWFA/tools/sourceDataConversion/* .
+		chmod u+rwx sourceData.py
+		chmod u+rwx sourceHistoryRead.py
+
+		# Modify script to add bashrc in front of them 
+		sed  -i '1i #! /usr/bin/env python' sourceHistoryRead.py
+		sed  -i '1i #! /usr/bin/env python' makeBoundaryDataFiles/data.py
+		sed  -i '1i #! /usr/bin/env python' makeBoundaryDataFiles/points.py
+		
+		# Modify script if k not needed in case LES model is smagorinsky
+		sed -i '59{s/^/#/;s/^##//}' makeBoundaryDataFiles.$inflowDir.sh		
+		sed -i '67{s/^/#/;s/^##//}' makeBoundaryDataFiles.$inflowDir.sh		
+		
+		# Run the required scripts
+		./makeBoundaryDataFiles.$inflowDir.sh > log.makeBound 2>&1
+		./sourceHistoryRead.py > log.sourceHistoryRead 2>&1
+		
+		# Make folder for drivingData
+		rm -rf ../drivingData; mkdir ../drivingData
+			
+		# Add first timestep to fill gapp between 20000 and 20000.xx timestep
+		arr=(./boundaryData/west/*)
+		chmod u+rwx boundaryData/west
+		if [[ -d $startTime ]]; then
+			echo "   -Already first timestep copied..."
+		else
+			cp -r ${arr[0]} ./boundaryData/west/$startTime
+		fi
+		
+		# Move the generated boundary data to driving data location
+		mv boundaryData/ sources ../drivingData
+			
+		# go back and zip postpocessing folder
+		cd ../
+		foldername=${PWD##*/}
+		foldername+="_drivingdata"
+		if [[ -f ./$foldername.zip ]]; then
+			rm -rf $foldername.zip
+		fi
+		zip -r $foldername.zip postProcessing > log.zipdrivingdata 2>&1
+	fi
+fi

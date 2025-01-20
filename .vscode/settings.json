@@ -12,6 +12,8 @@
         "flapequation.C": "cpp",
         "windPlantSolver.C": "cpp",
         "flapODE.C": "cpp",
-        "horizontalAxisWindTurbinesALMAdvanced.C": "cpp"
+        "horizontalAxisWindTurbinesALMAdvanced.C": "cpp",
+        "velocityABLWallFunctionFvPatchField.C": "cpp",
+        "setFieldsABL.C": "cpp"
     }
 }
