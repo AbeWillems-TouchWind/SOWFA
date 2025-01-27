@@ -21,21 +21,21 @@ FoamFile
     {
         type            wall;
         inGroups        1(wall);
-        nFaces          40000;
-        startFace       11920000;
+        nFaces          3000;
+        startFace       884000;
     }
     upper
     {
         type            patch;
-        nFaces          40000;
-        startFace       11960000;
+        nFaces          3000;
+        startFace       887000;
     }
     west
     {
         type            cyclic;
         inGroups        1(cyclic);
-        nFaces          20000;
-        startFace       12000000;
+        nFaces          3000;
+        startFace       890000;
         matchTolerance  0.0001;
         transform       unknown;
         neighbourPatch  east;
@@ -44,8 +44,8 @@ FoamFile
     {
         type            cyclic;
         inGroups        1(cyclic);
-        nFaces          20000;
-        startFace       12020000;
+        nFaces          3000;
+        startFace       893000;
         matchTolerance  0.0001;
         transform       unknown;
         neighbourPatch  west;
@@ -54,8 +54,8 @@ FoamFile
     {
         type            cyclic;
         inGroups        1(cyclic);
-        nFaces          20000;
-        startFace       12040000;
+        nFaces          10000;
+        startFace       896000;
         matchTolerance  0.0001;
         transform       unknown;
         neighbourPatch  south;
@@ -64,8 +64,8 @@ FoamFile
     {
         type            cyclic;
         inGroups        1(cyclic);
-        nFaces          20000;
-        startFace       12060000;
+        nFaces          10000;
+        startFace       906000;
         matchTolerance  0.0001;
         transform       unknown;
         neighbourPatch  north;

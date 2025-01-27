@@ -35,7 +35,9 @@ if [ $reconstruct -eq 1 ]; then
 				mv $startTime $startTime.initialconditions
 			fi
 		fi
-		reconstructPar > log.reconstructPar 2>&1
+		
+		rm -r 0/
+		reconstructPar -withZero > log.reconstructPar 2>&1
 		
 		foldername=${PWD##*/}
 		foldername+="_initialconditions"
