@@ -188,6 +188,7 @@ scalar zRef(setFieldsABLDict.lookupOrDefault<scalar>("zRef",600.0));
 bool useWallDistZ(setFieldsABLDict.lookupOrDefault<bool>("useWallDistZ",false));
 bool scaleVelocityWithHeight(setFieldsABLDict.lookupOrDefault<bool>("scaleVelocityWithHeight",false));
 scalar zInversion(setFieldsABLDict.lookupOrDefault<scalar>("zInversion",600.0));
+scalar velScalar(setFieldsABLDict.lookupOrDefault<scalar>("velScalar",1.0));
 scalar Ug(setFieldsABLDict.lookupOrDefault<scalar>("Ug",15.0));
 scalar UgDir(setFieldsABLDict.lookupOrDefault<scalar>("UgDir",270.0));
 scalar Tbottom(setFieldsABLDict.lookupOrDefault<scalar>("Tbottom",300.0));
@@ -271,7 +272,7 @@ if (updateInternalFields)
         scalar zAbsolute = 0.0;
         scalar zSurface = 0.0;
         scalar zColumn = 0.0;
-        scalar velScalar = 1.0;
+        //scalar velScalar = 1.0;
         if (useWallDistZ)
         {
             z = d[cellI];

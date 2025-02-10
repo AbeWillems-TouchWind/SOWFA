@@ -23,15 +23,26 @@ source $HOME/OpenFOAM/OpenFOAM-2.4.0/etc/bashrc
 cp system/controlDict.$runNumber system/controlDict
 
 # Display the last known time in a separate background process.
+firsttime=true
 log_file="log.$runNumber.$solver"
 touch "$log_file"  # Ensure the log file exists before the solver starts
 {
     while true; do
         last_time=$(grep "Time =" "$log_file" | tail -n 1)
         if [ -n "$last_time" ]; then
-            echo -ne "At $last_time / $endTime                                 \r"
+            if [ "$firsttime" = true ]; then
+                printf "At %s                              \nEndtime = %s                                                \n" "$last_time" "$endTime"
+                firsttime=false
+            else
+                printf "\r\033[F\033[F\rAt %s                              \nEndtime = %s                                \n" "$last_time" "$endTime"
+            fi
         else
-            echo -ne "No time reported yet.                                     \r"
+            if [ "$firsttime" = true ]; then
+                printf "No time reported yet.                              \n                                              \n"
+                firsttime=false
+            else
+                printf "\r\033[F\033[F\rNo time reported yet.                              \n                                              \n"
+            fi
         fi
         sleep 5
     done
